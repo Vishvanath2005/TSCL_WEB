@@ -16,6 +16,7 @@ const Report = () => {
   const [grievance, setGrievance] = useState([]);
   const [report, setReport] = useState([]);
   const token = sessionStorage.getItem("token");
+  const code = sessionStorage.getItem("code")
   const navigate = useNavigate();
    const handleform = () => {
     navigate("/form");
@@ -23,7 +24,7 @@ const Report = () => {
 
   useEffect(() => {
     axios
-      .get(`${API}/new-grievance/get`, {
+      .get(`${API}/new-grievance/getbyuserid?public_user_id=${code}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
