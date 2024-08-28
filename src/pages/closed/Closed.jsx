@@ -11,7 +11,7 @@ import decryptData from "../../Decrypt";
 const Closed = () => {
   const [searchValue, setSearchValue] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(12);
+  const [itemsPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [currentItems, setCurrentItems] = useState([]);
   const [report, setReport] = useState([]);
@@ -21,14 +21,17 @@ const Closed = () => {
 
   useEffect(() => {
     axios
-      .get(`${API}/new-grievance/getbyuserid?public_user_id=${code}`, {
+      .get(`${API}/new-grievance/getbyidstatus?public_user_id=${code}`, {
         headers: {
           Authorization: `Bearer ${token}`,
-        },
+        },        
       })
       .then((response) => {
         const responseData = decryptData(response.data.data);
         setReport(responseData);
+        console.log("hi",responseData);
+        
+        
 
         const filteredCenters = responseData.filter((report) =>
           Object.values(report).some((value) =>
@@ -37,7 +40,6 @@ const Closed = () => {
         );
 
         
-
         setTotalPages(Math.ceil(filteredCenters.length / itemsPerPage));
         const lastIndex = currentPage * itemsPerPage;
         const firstIndex = lastIndex - itemsPerPage;
@@ -54,39 +56,6 @@ const Closed = () => {
       setCurrentPage(pageNumber);
     }
   };
-
-  // const handleStatus = (value, report) => { //added
-  //   const formData = {
-  //     newgrievances: report,
-  //     status: value,
-  //   };
-  //   // axios
-  //   //   .put(`${API}/admin/updatestatus?user_id=${userId}`, formData)
-  //   //   .then((response) => {
-  //   //     console.log(`Status updated  for user ID ${userId}`, response);
-  //   //     handlerefresh();
-  //   //   })
-  //   //   .catch((error) => {
-  //   //     console.error(error);
-  //   //   });
-  // }; 
-
-  // const handlerefresh =() =>{ //added
-  //   axios.get(`${API}/admin/getall`).then((response) => {
-  //     setUsers(response.data);
-  //     // Recalculate filtered and paginated data
-  //     const filteredCenters = response.data.filter((user) =>
-  //       Object.values(user).some((value) =>
-  //         value.toString().toLowerCase().includes(searchValue.toLowerCase())
-  //       )
-  //     );
-  //     setTotalPages(Math.ceil(filteredCenters.length / itemsPerPage));
-  //     const lastIndex = currentPage * itemsPerPage;
-  //     const firstIndex = lastIndex - itemsPerPage;
-  //     setCurrentItems(filteredCenters.slice(firstIndex, lastIndex));
-  //   });
-  // }
-
 
 
   const lastIndex = currentPage * itemsPerPage; 

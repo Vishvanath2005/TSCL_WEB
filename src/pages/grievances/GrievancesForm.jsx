@@ -61,6 +61,7 @@ const GrievancesForm = () => {
   const [filteredComplaints, setFilteredComplaints] = useState([]);
   const [files, setFiles] = useState([]);
   const token = sessionStorage.getItem("token");
+  const code = sessionStorage.getItem("code");
 
   useEffect(() => {
     dispatch(fetchDepartment());
@@ -90,7 +91,7 @@ const GrievancesForm = () => {
     mode: "onBlur",
   });
 
-  const contactNumber = watch("phone");
+
   const zoneName = watch("zone_name");
   const wardName = watch("ward_name");
   const deptName = watch("dept_name");
@@ -133,11 +134,11 @@ const GrievancesForm = () => {
   }, [wardName, Street.data]);
 
   useEffect(() => {
-    if (contactNumber && contactNumber.length === 10) {
-      async function fetchAutoFillData() {
+ 
+      const fetchAutoFillData = async() => {
         try {
           const response = await axios.get(
-            `${API}/public-user/getbyphone?phone=${contactNumber}`,
+            `${API}/public-user/getbyid?public_user_id=${code}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -147,6 +148,7 @@ const GrievancesForm = () => {
           const responseData = decryptData(response.data.data);
           const autoFillData = responseData;
           setValue("public_user_name", autoFillData.public_user_name);
+          setValue("phone",autoFillData.phone);
           setValue("email", autoFillData.email);
           setValue("address", autoFillData.address);
           setValue("pincode", autoFillData.pincode);
@@ -156,14 +158,8 @@ const GrievancesForm = () => {
         }
       }
       fetchAutoFillData();
-    } else {
-      setValue("public_user_name", "");
-      setValue("email", "");
-      setValue("address", "");
-      setValue("pincode", "");
-      setAutoFillData(null);
-    }
-  }, [contactNumber]);
+  
+  }, [code]);
   const handleFileChange = (e) => {
     const files = e.target.files;
     if (files.length > 5) {
@@ -197,20 +193,17 @@ const GrievancesForm = () => {
     if (autoFillData) {
       const response = await axios.post(`${API}/public-user/post`, userInfo);
       public_user_id = autoFillData.public_user_id;
-    } else {
-      const response = await axios.post(`${API}/public-user/post`, userInfo);
-      public_user_id = response.data.data.public_user_id;
-    }
+    } 
 
     const grievanceDetails = {
       grievance_mode: data.grievance_mode,
-      complaint_type_title: data.complaint_type_title,
+      complaint_type_title: data.complaint,
       dept_name: data.dept_name,
       zone_name: data.zone_name,
       ward_name: data.ward_name,
       street_name: data.street_name,
       pincode: data.pincode,
-      complaint: data.complaint,
+      complaint: data.complaint_type_title,
       complaint_details: data.complaint_details,
       public_user_id: public_user_id,
       public_user_name: data.public_user_name,

@@ -10,17 +10,16 @@ import decryptData from "../../Decrypt";
 const Report = () => {
   const [searchValue, setSearchValue] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(12);
+  const [itemsPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [currentItems, setCurrentItems] = useState([]);
-  const [grievance, setGrievance] = useState([]);
+  const [status, setStatus] = useState([])
   const [report, setReport] = useState([]);
   const token = sessionStorage.getItem("token");
-  const code = sessionStorage.getItem("code")
+  const code = sessionStorage.getItem("code");
   const navigate = useNavigate();
-   const handleform = () => {
-    navigate("/form");
-  };
+  const [selectedStatus, setSelectedStatus] = useState("All");
+
 
   useEffect(() => {
     axios
@@ -39,8 +38,6 @@ const Report = () => {
           )
         );
 
-        
-
         setTotalPages(Math.ceil(filteredCenters.length / itemsPerPage));
         const lastIndex = currentPage * itemsPerPage;
         const firstIndex = lastIndex - itemsPerPage;
@@ -50,7 +47,24 @@ const Report = () => {
       .catch((error) => {
         console.error(error);
       });
+      fetchActiveStatus();
   }, [searchValue, currentPage]);
+
+  const fetchActiveStatus = async () => {
+    try {
+      const response = await axios.get(`${API}/status/getactive`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const responseData = decryptData(response.data.data);
+    
+      
+      setStatus(responseData);
+    } catch (err) {
+      console.error("Error fetching existing ActiveStatus:", err);
+    } 
+  };
 
   const paginate = (pageNumber) => {
     if (pageNumber > 0 && pageNumber <= totalPages) {
@@ -58,16 +72,38 @@ const Report = () => {
     }
   };
 
-  const lastIndex = currentPage * itemsPerPage; 
+  const lastIndex = currentPage * itemsPerPage;
   const firstIndex = lastIndex - itemsPerPage;
   const filteredCenters = report.filter((report) =>
     Object.values(report).some((value) =>
       value.toString().toLowerCase().includes(searchValue.toLowerCase())
-    ) 
+    )
   );
 
+ 
+  
 
-  const currentItemsOnPage = filteredCenters.slice(firstIndex, lastIndex);
+  const handleStatus = (status) => {
+    if (status === "All") {
+      setSelectedStatus('All');
+    } else {
+      setSelectedStatus(status);
+    }
+    paginate(1);
+  };
+
+  const currentItemsOnPage = filteredCenters
+  .filter((report) => {
+  
+    const statusMatch = selectedStatus === 'All' ? true : report.status === selectedStatus;
+    
+     
+    return statusMatch ;
+  })
+  .slice(firstIndex, lastIndex);
+
+
+
 
   return (
     <div className="overflow-y-auto no-scrollbar">
@@ -87,35 +123,39 @@ const Report = () => {
           </button>
         </div>
         <div className="bg-white h-4/5 mx-3 rounded-lg p-3">
-          <div className="flex justify-between gap-6 mt-4 mx-3">
+        <div className="flex justify-between items-center gap-6 mt-2 mx-3">
             <div className="flex flex-wrap gap-3">
-              <p className="text-lg font-semibold whitespace-nowrap">
-                View Report
-              </p>
+              <p className="text-lg  whitespace-nowrap">View Report</p>
             </div>
-            <div className="flex gap-2 flex-wrap">
-              <div className="flex flex-col">
-                <select
-                  className="block w-full  px-3 py-2  text-sm font-bold text-black border border-black rounded-lg bg-gray-50   hover:border-gray-200 outline-none"
-                  value={report.status}
-                  onChange={(e) => handleStatus(e.newgrievances, report.status)}
-                  // {...register("grievance_status")}
+            <div className="flex flex-wrap gap-2">
+           
+              <div className="flex gap-2 flex-wrap">
+                <select className="block w-full  px-1 py-2 text-center  text-sm bg-primary text-white  border border-none rounded-full  hover:border-gray-200 outline-none capitalize"
+                 onChange={(e) =>
+                  handleStatus(e.target.value)
+                }
+                value={selectedStatus || ""}
                 >
-                  <option value="" disabled>
-                    Status
+                  <option hidden >
+                   Status
                   </option>
-                  <option value="New">New</option>
-                  <option value="InProgress">Inprogress</option>
-                  <option value="Closed">Closed</option>
-                  <option value="Onhold">Onhold</option>
-                  <option value="Resolve">Resolve</option>
+                  <option value='All' >
+                  All
+                  </option>
+                  {status &&
+                          status.map((option) => (
+                            <option
+                              key={option.status_name}
+                              value={option.status_name}
+                            >
+                              {option.status_name}
+                            </option>
+                          ))}
                 </select>
-                {/* {errors.grievance_mode && (
-                      <p className="text-red-500 text-xs text-start px-2 pt-2">
-                        {errors.grievance_mode.message}
-                      </p>
-                    )} */}
+                
               </div>
+             
+              
             </div>
           </div>
           <div className=" rounded-lg  py-3 overflow-x-auto no-scrollbar">
@@ -156,12 +196,13 @@ const Report = () => {
                 </tr>
               </thead>
               <tbody>
-                {currentItemsOnPage.map((report, index) => (
+              {currentItemsOnPage.map((report, index) => (
                   <tr className=" border-b border-gray-300  " key={index}>
                     <td>
                       <p className="border-2 w-28 border-black rounded-lg text-center py-1 my-1  ">
                         {report.grievance_id}
                       </p>
+                      
                     </td>
                     <td>
                       <p className=" text-start mx-1.5  my-2 font-lexend whitespace-nowrap text-sm">
