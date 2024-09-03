@@ -14,7 +14,8 @@ import Report from './pages/grievances/Report'
 import Viewreport from './pages/report/Viewreport'
 import ViewRequest from './pages/grievances/ViewRequest'
 import Closed from './pages/closed/Closed'
-import GrivanceWorksheet from './pages/grievances/GrievanceWorksheet';
+import Profile from './pages/profile/Profile';
+
 
 function App() {
   const [count, setCount] = useState(0)
@@ -31,8 +32,8 @@ function App() {
     <Route path='/form' element={<GrievancesForm />} />
     <Route path='/report' element={<Report/>}/>
     <Route path='/viewreport' element={<Viewreport/>}/>
+    <Route path='/profile' element={<Profile/>}/>
     <Route path='/view' element={<ViewRequest/>}/>
-    <Route path='/worksheet' element={<GrivanceWorksheet/>}/>
     </Route>
     </Routes>
     </BrowserRouter>

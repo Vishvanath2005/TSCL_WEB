@@ -87,7 +87,7 @@ const Closed = () => {
               <thead className=" border-b border-gray-300  ">
                 <tr className="">
                   <th>
-                    <p className="mx-1.5 my-2 text-start font-lexend font-semibold whitespace-nowrap">
+                    <p className="mx-1.5 my-2 text-start font-lexend font-semibold  whitespace-nowrap">
                       Complaint No
                     </p>
                   </th>
@@ -120,7 +120,7 @@ const Closed = () => {
                 </tr>
               </thead>
               <tbody>
-                {currentItemsOnPage.map((report, index) => (
+                {currentItemsOnPage.slice().reverse().map((report, index) => (
                   <tr className=" border-b border-gray-300  " key={index}>
                     <td>
                       <p className="border-2 w-28 border-black rounded-lg text-center py-1 my-1  ">

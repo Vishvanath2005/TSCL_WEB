@@ -13,7 +13,7 @@ const Header = () => {
 
   const handleProfileClick = () => {
    
-    // navigate("/profile");
+    navigate("/profile");
     setIsDropdownOpen(false); n
   };
 

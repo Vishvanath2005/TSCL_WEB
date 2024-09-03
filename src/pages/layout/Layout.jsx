@@ -25,7 +25,7 @@ const Layout = () => {
   const [submenuopen, Setsubmenuopen] = useState(false);
  
   const Menus = [
-    { title: "Dashboard", icon: <RxHome /> },
+    // { title: "Dashboard", icon: <RxHome />, to:"/dashboard"},
     // { title: "Organization", icon: <GoOrganization />, to: "/organization" },
     // { title: "Department", icon: <SiAwsorganizations />, to: "/department" },
     // {
@@ -52,7 +52,7 @@ const Layout = () => {
 
 
   return (
-    <div className="w-full h-screen relative  md:flex">
+    <div className="w-full h-screen relative z-0 md:flex">
     
       <div
         className={` md:relative md:grid md:grid-rows-12 absolute   transition-all duration-100 ${

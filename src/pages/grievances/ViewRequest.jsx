@@ -10,11 +10,13 @@ const ViewRequest = () => {
   const [dataFile, setDataFile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [matchData, setMatchData] = useState([]);
   const location = useLocation();
   const grievanceId = location.state?.grievanceId;
   const token = sessionStorage.getItem("token");
   const [isviewModal, setIsviewModal] = useState(false);
   const [attachmentFile, setAttachmentFile] = useState(null);
+  const [logData, setLogData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -195,94 +197,136 @@ const ViewRequest = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-300">
-                      <tr className="border-b-2  border-gray-300">
-                        <td className="text-center mx-3 py-2.5 whitespace-nowrap">
-                          15-05-2024 / 12:00 AM
-                        </td>
-                        <td className="text-center  mx-3 py-2.5 whitespace-nowrap">
-                          R-0001122
-                        </td>
-                        <td className="text-center  mx-3 py-2.5 text-green-600 whitespace-nowrap">
-                          In Progress
-                        </td>
-                      </tr>
-                      <tr className="border-b-2 border-gray-300">
-                        <td className="text-center mx-2 my-2 whitespace-nowrap">
-                          15-05-2024 / 12:00 AM
-                        </td>
-                        <td className="text-center  mx-2 my-2 whitespace-nowrap">
-                          R-0001122
-                        </td>
-                        <td className="text-center  mx-2 my-2 text-green-600 whitespace-nowrap">
-                          In Progress
-                        </td>
-                      </tr>
-                    </tbody>
+  {matchData && matchData.length > 0 ? (
+    matchData.map((data, index) => (
+      <tr
+        className="border-b-2 border-gray-300"
+        key={index}
+      >
+        <td className="text-center mx-3 py-2.5 whitespace-nowrap">
+          {formatDate1(data.createdAt)}
+        </td>
+        <td className="text-center mx-3 py-2.5 whitespace-nowrap">
+          {data.grievance_id}
+        </td>
+        <td className="text-center mx-3 py-2.5 text-green-600 whitespace-nowrap capitalize">
+          {data.status}
+        </td>
+      </tr>
+    ))
+  ) : (
+    <tr>
+      <td className="text-center py-2.5" colSpan="3">
+        No matching data found
+      </td>
+    </tr>
+  )}
+</tbody>
                   </table>
                 </div>
               </div>
             </div>
             <div className="mx-3 my-3">
               <p className="mb-2 mx-1 text-lg">Complaint History</p>
-              <div className="bg-gray-100 py-3">
-                <div className="mx-8">
+              <div className="bg-gray-100 py-3 h-[530px]">
+                <div className="mx-8 ">
                   <p className="py-3 font-semibold">
                     Complaint No {data.grievance_id}
                   </p>
-                  <p className="py-2">
-                    {new Date(data.createdAt).toLocaleDateString()}
-                  </p>
-                  <div className="grid grid-cols-3 divide-x-2 divide-black">
-                    <p>
-                      {new Date(data.createdAt).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        hour12: true,
-                      })}
+                  <div className="h-[280px]  overflow-x-auto no-scrollbar mb-3">
+                    {logData &&
+                      logData
+                        .slice()
+                        .reverse()
+                        .map((logEntry, index) => (
+                          <div key={index}>
+                            <p className="py-1">
+                              {new Date(
+                                logEntry.createdAt
+                              ).toLocaleDateString()}
+                            </p>
+                            <div className="grid grid-cols-3 divide-x-2 divide-black">
+                              <p>
+                                {new Date(
+                                  logEntry.createdAt
+                                ).toLocaleTimeString([], {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                  hour12: true,
+                                })}
+                              </p>
+                              <p className="pl-5 col-span-2">
+                                {logEntry.log_details}
+                              </p>
+                            </div>
+                            <br />
+                          </div>
+                        ))}
+
+                    <p className="py-2">
+                      {new Date(data.createdAt).toLocaleDateString()}
                     </p>
-                    <p className="pl-5 col-span-2">Logged In</p>
+                    <div className="grid grid-cols-3 divide-x-2 divide-black">
+                      <p>
+                        {new Date(data.createdAt).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          hour12: true,
+                        })}
+                      </p>
+                      <p className="pl-5 col-span-2">
+                        {" "}
+                        Assigned To Particular Department
+                      </p>
+                    </div>
+                    <br />
+                    <div className="grid grid-cols-3 divide-x-2 divide-black">
+                      <p>
+                        {new Date(data.createdAt).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          hour12: true,
+                        })}
+                      </p>
+                      <p className="pl-5 col-span-2">
+                        Ticket Raised- {data.grievance_id}
+                      </p>
+                    </div>
+                    <br />
+                    <div className="grid grid-cols-3 divide-x-2 divide-black">
+                      <p>
+                        {new Date(data.createdAt).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          hour12: true,
+                        })}
+                      </p>
+                      <p className="pl-5 col-span-2">Logged In</p>
+                    </div>
                   </div>
-                  <br />
+
+                  <p className="mb-2">Work StatusFlow :</p>
+
                   <div className="grid grid-cols-3 divide-x-2 divide-black">
                     <p>
-                      {new Date(data.createdAt).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        hour12: true,
-                      })}
-                    </p>
-                    <p className="pl-5 col-span-2">
-                      Ticket Raised {data.grievance_id}
-                    </p>
-                  </div>
-                  <br />
-                  <div className="grid grid-cols-3 divide-x-2 divide-black">
-                    <p>
-                      {new Date(data.createdAt).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        hour12: true,
-                      })}
-                    </p>
-                    <p className="pl-5 col-span-2">
-                      Assigned To Particular Department
-                    </p>
-                  </div>
-                  <br />
-                  <p className="mb-2">
-                    {new Date(data.updatedAt).toLocaleDateString()}
-                  </p>
-                  <div className="grid grid-cols-3 divide-x-2 divide-black">
-                    <p>
+                      <span className="block">
+                        {new Date(data.updatedAt).toLocaleDateString()}
+                      </span>
                       {new Date(data.updatedAt).toLocaleTimeString([], {
                         hour: "2-digit",
                         minute: "2-digit",
                         hour12: true,
                       })}
                     </p>
+
                     <div className="col-span-2">
                       <p className="pl-5">Status:</p>
-                      <p className="pl-5 text-gray-500">{data.statusflow}/</p>
+                      <p className="pl-5 text-gray-500">
+                        {data.statusflow
+                          .split("/")
+                          .join(" / ")
+                          .replace(/(?: \/ ){5}/g, " / \n")}
+                      </p>
                     </div>
                   </div>
                   <hr className="my-3" />
