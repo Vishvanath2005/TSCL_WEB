@@ -4,8 +4,6 @@ import { API } from "../../Host";
 import { useLocation } from "react-router-dom";
 import decryptData from "../../Decrypt";
 import { BsSendFill } from "react-icons/bs";
-// import ViewAttachment from "../request/ViewAttachment";
-import { AiOutlineGlobal } from "react-icons/ai";
 
 const GrivanceWorksheet = () => {
   const [data, setData] = useState(null);
@@ -121,19 +119,6 @@ const GrivanceWorksheet = () => {
                   </span>
                 </div>
               </div>
-
-              {/* <div className="col-span-3">
-              <select className="col-span-2 block px-4 py-3 text-sm text-black border rounded-lg border-none outline-none">
-                <option hidden>Assign Emp</option>
-                <option value="Ravi">Ravi</option>
-                <option value="Kumar">Kumar</option>
-              </select>
-            </div>
-            <div className="col-span-2">
-              <button className="bg-primary px-4 py-1.5 text-white rounded-full">
-                Submit
-              </button>
-            </div> */}
             </div>
             <hr />
             <div className="grid grid-cols-12 gap-2 mx-3 my-4">

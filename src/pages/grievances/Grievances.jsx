@@ -205,22 +205,6 @@ const Grivences = () => {
                     {grievances.dept_name}
                     </div>
                   </td>
-                  {/* <td>
-                    <div className="flex gap-2 items-center mx-3  my-2 font-lexend whitespace-nowrap justify-center">
-                    {grievances.zone_name}
-                    </div>
-                  </td>
-                  <td>
-                    <div className="flex gap-2 items-center mx-3  my-2 font-lexend whitespace-nowrap justify-center">
-                    {grievances.ward_name}
-                    </div>
-                  </td>
-                  <td>
-                    <div className="flex gap-2 items-center mx-3  my-2 font-lexend whitespace-nowrap justify-center">
-                    {grievances.street_name}
-                    </div>
-                  </td> */}
-                 
                   <td>
                     <div className="mx-3 my-3 whitespace-nowrap" onClick={() =>
                       navigate(`/viewreport`, {

@@ -196,7 +196,7 @@ const GrievancesForm = () => {
     } 
 
     const grievanceDetails = {
-      grievance_mode: data.grievance_mode,
+      grievance_mode: `website`,
       complaint_type_title: data.complaint,
       dept_name: data.dept_name,
       zone_name: data.zone_name,

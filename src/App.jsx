@@ -1,43 +1,47 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import reactLogo from "./assets/react.svg";
+import viteLogo from "/vite.svg";
+import "./App.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom" 
-import Login from './pages/auth/Login'
-import OTP from './pages/auth/OTP'
-import SignUp from './pages/auth/SignUp'
-import Layout from './pages/layout/Layout'
-import GrievancesForm from './pages/grievances/GrievancesForm'
-import Report from './pages/grievances/Report'
-import Viewreport from './pages/report/Viewreport'
-import ViewRequest from './pages/grievances/ViewRequest'
-import Closed from './pages/closed/Closed'
-import Profile from './pages/profile/Profile';
-
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Login from "./pages/auth/Login";
+import OTP from "./pages/auth/OTP";
+import SignUp from "./pages/auth/SignUp";
+import Layout from "./pages/layout/Layout";
+import GrievancesForm from "./pages/grievances/GrievancesForm";
+import Report from "./pages/grievances/Report";
+import Viewreport from "./pages/report/Viewreport";
+import ViewRequest from "./pages/grievances/ViewRequest";
+import Closed from "./pages/closed/Closed";
+import Profile from "./pages/profile/Profile";
+// import Tabs from "./pages/dashboard/tabs/Tabs";
+import Guestform from "./pages/guest/Guestform";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(0);
 
   return (
-   <>
-   <BrowserRouter>
-   <Routes>
-    <Route path='' element={<Login/>} />
-    <Route path='/auth' element={<OTP/>} />
-    <Route path='/signup' element={<SignUp/>} />
-    <Route path="/" element={<Layout />}>
-    <Route path='/closed' element={<Closed/>}/>
-    <Route path='/form' element={<GrievancesForm />} />
-    <Route path='/report' element={<Report/>}/>
-    <Route path='/viewreport' element={<Viewreport/>}/>
-    <Route path='/profile' element={<Profile/>}/>
-    <Route path='/view' element={<ViewRequest/>}/>
-    </Route>
-    </Routes>
-    </BrowserRouter>
-    <ToastContainer
+    <>
+      <BrowserRouter>
+        <Routes>
+          <Route path="" element={<Login />} />
+          <Route path="/auth" element={<OTP />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/guest" element={<Guestform/>}/>
+          <Route path="/" element={<Layout />}>
+            <Route path="/closed" element={<Closed />} />
+            <Route path="/form" element={<GrievancesForm />} />
+            <Route path="/report" element={<Report />} />
+            <Route path="/viewreport" element={<Viewreport />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/view" element={<ViewRequest />} />
+            {/* <Route path="/tabs" element={<Tabs />} /> */}
+           
+          </Route>
+        </Routes>
+      </BrowserRouter>
+      <ToastContainer
         position="top-right"
         autoClose={1000}
         hideProgressBar={false}
@@ -49,8 +53,8 @@ function App() {
         pauseOnHover
         theme="light"
       />
-   </>
-  )
+    </>
+  );
 }
 
-export default App
+export default App;

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { BsEyeSlashFill } from "react-icons/bs";
+import { BsEyeFill } from "react-icons/bs";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import decryptData from "../../Decrypt";
@@ -42,6 +44,9 @@ const Profile = () => {
   const [autoFillData, setAutoFillData] = useState(null);
   const [data, setData] = useState({});
   const [isPassword, setIsPassword] = useState(null);
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showOldPassword, setShowOldPassword] = useState(false);
   const navigate = useNavigate();
 
   const {
@@ -78,9 +83,12 @@ const Profile = () => {
           }
         );
         const responseData = decryptData(response.data.data);
+        
+        setData(responseData);
         const autoFillData = responseData;
         setValue("public_user_name", autoFillData.public_user_name);
         setValue("phone",autoFillData.phone);
+        setIsPassword(responseData.phone);
         setValue("email", autoFillData.email);
         setValue("address", autoFillData.address);
         setValue("pincode", autoFillData.pincode);
@@ -93,60 +101,35 @@ const Profile = () => {
 
 }, [code]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          `${API}/user/getbyid?public_user_id=${code}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const responseData = decryptData(response.data.data);
-        setData(responseData);
-        setValue("user_name", responseData.public_user_name);
-        setValue("phone", responseData.phone);
-        setIsPassword(responseData.phone)
-        setValue("email", responseData.email);
-        setValue("address", responseData.address);
-        setValue("pincode", responseData.pincode);
-      } catch (error) {
-        console.error("Error fetching data", error);
-      }
-    };
-    fetchData();
-  }, [code, setValue]);
-
-  const onSubmit = async (data) => {
-    const formData = {
-      ...data,
-    };
-
-    try {
-      const response = await axios.post(
-        `${API}/user/update?public_user_id=${code}`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (response.status === 200) {
-        toast.success("Profile Updated Successfully");
-        setIsPassword(null)
-        navigate("/dashboard");
-      } else {
-        console.error("Error in posting data", response);
-        toast.error("Failed to Upload");
-      }
-    } catch (error) {
-      console.error("Error in posting data", error);
-    }
+const onSubmit = async (data) => {
+  const formData = {
+    ...data,
   };
+
+  try {
+    const response = await axios.post(
+      `${API}/public-user/update?public_user_id=${code}`,
+      formData,
+      
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.status === 200) {
+      toast.success("Profile Updated Successfully");
+      setIsPassword(null);
+      navigate("/dashboard");
+    } else {
+      console.error("Error in posting data", response);
+      toast.error("Failed to Upload");
+    }
+  } catch (error) {
+    console.error("Error in posting data", error);
+  }
+};
 
   const onChangePassword = async (data) => {
     const formData = {
@@ -155,7 +138,7 @@ const Profile = () => {
   
     try {
       const response = await axios.post(
-        `${API}/user/userchangepassword?phone=${isPassword}`,
+        `${API}/public-user/changePassword?phone=${isPassword}`,
         formData,
         {
           headers: {
@@ -167,7 +150,7 @@ const Profile = () => {
       if (response.status === 200) {
         toast.success(response.data.message);
         setIsPassword(null)
-        navigate("/dashboard");
+        navigate("/report");
       } else {
         //console.error("Error in posting data", response);
         toast.error(response.data.message); 
@@ -178,16 +161,23 @@ const Profile = () => {
       }
   };
 
+  const handleTogglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const handleTogglePassword = () => {
+    setShowOldPassword(!showOldPassword);
+  };
+
   return (
     <div className="grid grid-cols-12 gap-3 mx-3 my-4 overflow-y-auto no-scrollbar">
-      <div className="md:col-span-6 col-span-12  border w-full px-2 py-3 rounded-lg  bg-white">
+     <div className="md:col-span-6 col-span-12  border w-full px-2 py-3 rounded-lg  bg-white">
         {data && (
           <div className="md:col-span-4 col-span-6 ">
             <div className="flex flex-row justify-center gap-4 items-center my-4">
               <div className="flex mb-3 items-center">
                 <p className="text-5xl bg-blue-200 text-gray-600 px-7 py-5 rounded-full">
-               
-                  {data.public_user_name ? data.public_user_name.slice(0, 1) : "P"}
+                  {data.public_user_name ? data.public_user_name.slice(0, 1) : "T"}
                 </p>
               </div>
 
@@ -206,9 +196,6 @@ const Profile = () => {
                     className="w-full md:w-80 text-start border-2 bg-gray-200 rounded-lg mx-2  px-2 py-2 outline-none text-gray-600"
                     placeholder="Phone Number"
                     {...register("phone")}
-                    defaultValue={
-                      autoFillData ? autoFillData.public_user_name : ""
-                    }
                     readOnly
                   />
                 </div>
@@ -230,10 +217,14 @@ const Profile = () => {
                     className="w-full md:w-80 text-start border-2 overflow-hidden rounded-lg mx-2  px-2 py-2 outline-none text-gray-700"
                     placeholder="User Name"
                     {...register("user_name")}
+                    {...register("public_user_name")}
+                    defaultValue={
+                      autoFillData ? autoFillData.public_user_name : ""
+                    }
                   />
-                  {errors.public_user_name && (
+                  {errors.user_name && (
                     <p className="text-red-500 text-xs text-start px-2 pt-2">
-                      {errors.public_user_name.message}
+                      {errors.user_name.message}
                     </p>
                   )}
                 </div>
@@ -310,45 +301,71 @@ const Profile = () => {
         <div className="md:flex md:justify-center mt-8">
         <form onSubmit={handleSubmitPassword(onChangePassword)}>
        
-          <div className="col-span-4 my-4  px-3">
-            <input
-              type="password"
-              id="old_password"
-              className="w-full md:w-80 text-start border-2  rounded-lg mx-2  px-2 py-2 outline-none"
-              placeholder="Old Password"
-              {...registerPassword("old_password")}
-            />
-            {passwordErrors.old_password && (
+        <div className="col-span-4 my-4  px-3">
+              <div className="flex items-center border-2  rounded-lg mx-2  px-2 py-2 outline-none">
+                <input
+                  type={showOldPassword ? "text" : "password"}
+                  id="old_password"
+                  className="w-full md:w-72 text-start outline-none"
+                  placeholder="Old Password"
+                  {...registerPassword("old_password")}
+                />
+                <button
+                  type="button"
+                  className="text-gray-500 hover:text-gray-900 transition duration-300 outline-none"
+                  onClick={handleTogglePassword}
+                >
+                  {showOldPassword ? <BsEyeFill /> : <BsEyeSlashFill />}
+                </button>
+              </div>
+              {passwordErrors.old_password && (
                 <p className="text-red-500 text-xs text-start px-2 pt-2">
                   {passwordErrors.old_password.message}
                 </p>
               )}
-          </div>
+            </div>
+            <div className="col-span-4 my-4  px-3">
+              <div className="flex items-center border-2  rounded-lg mx-2  px-2 py-2 outline-none">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="new_password"
+                  className="w-full md:w-72 text-start outline-none"
+                  placeholder="New Password"
+                  {...registerPassword("new_password")}
+                />
+                <button
+                  type="button"
+                  className="text-gray-500 hover:text-gray-900 transition duration-300 outline-none"
+                  onClick={handleTogglePasswordVisibility}
+                >
+                  {showPassword ? <BsEyeFill /> : <BsEyeSlashFill />}
+                </button>
+              </div>
+            </div>
 
-          <div className="col-span-4 my-4  px-3">
-            <input
-              type="password"
-              id="new_password"
-              className="w-full md:w-80 text-start border-2  rounded-lg mx-2  px-2 py-2 outline-none"
-              placeholder="New Password"
-              {...registerPassword("new_password")}
-            />
-          </div>
-
-          <div className="col-span-4 my-4  px-3">
-            <input
-              type="password"
-              id="login_password"
-              className="w-full md:w-80 text-start border-2  rounded-lg mx-2  px-2 py-2 outline-none"
-              placeholder="Confirm Password"
-              {...registerPassword("login_password")}
-            />
-            {passwordErrors.login_password && (
+            <div className="col-span-4 my-4  px-3">
+              <div className="flex items-center border-2  rounded-lg mx-2  px-2 py-2 outline-none">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="login_password"
+                  className="w-full md:w-72 text-start outline-none "
+                  placeholder="Confirm Password"
+                  {...registerPassword("login_password")}
+                />
+                <button
+                  type="button"
+                  className="text-gray-500 hover:text-gray-900 transition duration-300 outline-none"
+                  onClick={handleTogglePasswordVisibility}
+                >
+                  {showPassword ? <BsEyeFill /> : <BsEyeSlashFill />}
+                </button>
+              </div>
+              {passwordErrors.login_password && (
                 <p className="text-red-500 text-xs text-start px-2 pt-2">
                   {passwordErrors.login_password.message}
                 </p>
               )}
-          </div>
+            </div>
 
           <div className=" text-center my-6 sm:py-5">
             <button

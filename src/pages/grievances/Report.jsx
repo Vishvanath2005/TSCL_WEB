@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { RiExpandUpDownLine } from "react-icons/ri";
-import { BsThreeDotsVertical } from "react-icons/bs";
 import { API, formatDate } from "../../Host";
 import axios from "axios";
 import { FaPlus } from "react-icons/fa6";
@@ -13,13 +12,13 @@ const Report = () => {
   const [itemsPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [currentItems, setCurrentItems] = useState([]);
-  const [status, setStatus] = useState([])
+  const [statusColors, setStatusColors] = useState({});
+  const [status, setStatus] = useState([]);
   const [report, setReport] = useState([]);
   const token = sessionStorage.getItem("token");
   const code = sessionStorage.getItem("code");
   const navigate = useNavigate();
   const [selectedStatus, setSelectedStatus] = useState("All");
-
 
   useEffect(() => {
     axios
@@ -47,7 +46,7 @@ const Report = () => {
       .catch((error) => {
         console.error(error);
       });
-      fetchActiveStatus();
+    fetchActiveStatus();
   }, [searchValue, currentPage]);
 
   const fetchActiveStatus = async () => {
@@ -58,12 +57,16 @@ const Report = () => {
         },
       });
       const responseData = decryptData(response.data.data);
-    
-      
+      const colorMapping = responseData.reduce((acc, status) => {
+        acc[status.status_name] = status.color;
+        return acc;
+      }, {});
+
       setStatus(responseData);
+      setStatusColors(colorMapping);
     } catch (err) {
       console.error("Error fetching existing ActiveStatus:", err);
-    } 
+    }
   };
 
   const paginate = (pageNumber) => {
@@ -80,12 +83,9 @@ const Report = () => {
     )
   );
 
- 
-  
-
   const handleStatus = (status) => {
     if (status === "All") {
-      setSelectedStatus('All');
+      setSelectedStatus("All");
     } else {
       setSelectedStatus(status);
     }
@@ -93,17 +93,13 @@ const Report = () => {
   };
 
   const currentItemsOnPage = filteredCenters
-  .filter((report) => {
-  
-    const statusMatch = selectedStatus === 'All' ? true : report.status === selectedStatus;
-    
-     
-    return statusMatch ;
-  })
-  .slice(firstIndex, lastIndex);
+    .filter((report) => {
+      const statusMatch =
+        selectedStatus === "All" ? true : report.status === selectedStatus;
 
-
-
+      return statusMatch;
+    })
+    .slice(firstIndex, lastIndex);
 
   return (
     <div className="overflow-y-auto no-scrollbar">
@@ -123,39 +119,30 @@ const Report = () => {
           </button>
         </div>
         <div className="bg-white h-4/5 mx-3 rounded-lg p-3">
-        <div className="flex justify-between items-center gap-6 mt-2 mx-3">
+          <div className="flex justify-between items-center gap-6 mt-2 mx-3">
             <div className="flex flex-wrap gap-3">
               <p className="text-lg  whitespace-nowrap">View Report</p>
             </div>
             <div className="flex flex-wrap gap-2">
-           
               <div className="flex gap-2 flex-wrap">
-                <select className="block w-full  px-1 py-2 text-center  text-sm bg-primary text-white  border border-none rounded-full  hover:border-gray-200 outline-none capitalize"
-                 onChange={(e) =>
-                  handleStatus(e.target.value)
-                }
-                value={selectedStatus || ""}
+                <select
+                  className="block w-full  px-1 py-2 text-center  text-sm bg-primary text-white  border border-none rounded-full  hover:border-gray-200 outline-none capitalize"
+                  onChange={(e) => handleStatus(e.target.value)}
+                  value={selectedStatus || ""}
                 >
-                  <option hidden >
-                   Status
-                  </option>
-                  <option value='All' >
-                  All
-                  </option>
+                  <option hidden>Status</option>
+                  <option value="All">All</option>
                   {status &&
-                          status.map((option) => (
-                            <option
-                              key={option.status_name}
-                              value={option.status_name}
-                            >
-                              {option.status_name}
-                            </option>
-                          ))}
+                    status.map((option) => (
+                      <option
+                        key={option.status_name}
+                        value={option.status_name}
+                      >
+                        {option.status_name}
+                      </option>
+                    ))}
                 </select>
-                
               </div>
-             
-              
             </div>
           </div>
           <div className=" rounded-lg  py-3 overflow-x-auto no-scrollbar">
@@ -163,7 +150,7 @@ const Report = () => {
               <thead className=" border-b border-gray-300  ">
                 <tr className="">
                   <th>
-                    <p className="mx-1.5 my-2 text-start font-lexend font-medium whitespace-nowrap">
+                    <p className="mx-1.5 my-2 text-start font-lexend font-semibold whitespace-nowrap">
                       Complaint No
                     </p>
                   </th>
@@ -184,63 +171,81 @@ const Report = () => {
                     </p>
                   </th>
                   <th>
-                    <p className="flex gap-2 items-center justify-start mx-1.5 my-2 font-lexend font-semibold whitespace-nowrap">
-                      Status <RiExpandUpDownLine />
+                    <p className="flex gap-2 items-center justify-center mx-2 my-2 font-lexend font-semibold  whitespace-nowrap">
+                      Priority <RiExpandUpDownLine />
                     </p>
                   </th>
                   <th>
                     <p className="flex gap-2 items-center justify-start mx-1.5 my-2 font-lexend font-semibold whitespace-nowrap">
-                      Action
+                      Status <RiExpandUpDownLine />
                     </p>
                   </th>
                 </tr>
               </thead>
               <tbody>
-              {currentItemsOnPage.slice().reverse().map((report, index) => (
-                  <tr className=" border-b border-gray-300  " key={index}>
-                    <td>
-                      <p className="border-2 w-28 border-black rounded-lg text-center py-1 my-1  ">
-                        {report.grievance_id}
+                {currentItemsOnPage
+                  .slice()
+                  .reverse()
+                  .map((report, index) => (
+                    <tr className=" border-b border-gray-300  " key={index}>
+                      <td>
+                        <p
+                          className="border-2 w-28 border-black rounded-lg text-center py-1 my-1  "
+                          onClick={() =>
+                            navigate(`/view`, {
+                              state: { grievanceId: report.grievance_id },
+                            })
+                          }
+                        >
+                          {report.grievance_id}
+                        </p>
+                      </td>
+                      <td>
+                        <p className=" text-start mx-1.5  my-2 font-lexend whitespace-nowrap text-sm">
+                          {formatDate(report.createdAt)}
+                        </p>
+                      </td>
+                      <td>
+                        {" "}
+                        <p className=" text-start mx-1.5  my-2 font-lexend whitespace-nowrap text-sm">
+                          {report.public_user_name}
+                        </p>
+                      </td>
+                      <td>
+                        {" "}
+                        <p className=" text-start mx-1.5  my-2 font-lexend whitespace-nowrap text-sm">
+                          {report.dept_name}
+                        </p>
+                      </td>
+                      <td>
+                      <p
+                        className={`border-2 w-26 rounded-full text-center py-1.5 mx-2 text-sm font-medium capitalize  ${
+                          report.priority === "High"
+                            ? "text-red-500 border-red-500"
+                            : report.priority === "Medium"
+                            ? "text-sky-500 border-sky-500"
+                            : report.priority === "Low"
+                            ? "text-green-500 border-green-500"
+                            : ""
+                        }`}
+                      >
+                        {report.priority}
                       </p>
-                      
                     </td>
                     <td>
-                      <p className=" text-start mx-1.5  my-2 font-lexend whitespace-nowrap text-sm">
-                        {formatDate(report.createdAt)}
-                      </p>
-                    </td>
-                    <td>
-                      {" "}
-                      <p className=" text-start mx-1.5  my-2 font-lexend whitespace-nowrap text-sm">
-                        {report.public_user_name}
-                      </p>
-                    </td>
-                    <td>
-                      {" "}
-                      <p className=" text-start mx-1.5  my-2 font-lexend whitespace-nowrap text-sm">
-                        {report.dept_name}
-                      </p>
-                    </td>
-                    <td>
-                      {" "}
-                      <p className="border-2 w-28 border-black rounded-full text-center py-1 tex-sm  ">
+                      <p
+                        className="border-2 w-28 rounded-full text-center py-1 tex-sm font-normal mx-2 capitalize  "
+                        style={{
+                          borderColor: statusColors[report.status] || "gray",
+                          color: statusColors[report.status] || "black",
+                          fontSize: 14,
+                        }}
+                      >
                         {report.status}
                       </p>
                     </td>
-                    <td>
-                      <div
-                        className="mx-3 my-3 whitespace-nowrap"
-                        onClick={() =>
-                          navigate(`/view`, {
-                            state: { grievanceId: report.grievance_id },
-                          })
-                        }
-                      >
-                        <BsThreeDotsVertical />
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>

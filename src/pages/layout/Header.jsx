@@ -14,7 +14,7 @@ const Header = () => {
   const handleProfileClick = () => {
    
     navigate("/profile");
-    setIsDropdownOpen(false); n
+    setIsDropdownOpen(false); 
   };
 
   const handleLogoutClick = () => {

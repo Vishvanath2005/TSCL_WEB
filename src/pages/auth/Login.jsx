@@ -88,6 +88,10 @@ const Login = ({ setToken }) => {
     navigate("/signup");
   };
 
+  const handlesguest =() =>{
+    navigate("/guest")
+  }
+
 
 
   return (
@@ -145,12 +149,20 @@ const Login = ({ setToken }) => {
                   </p>
                 )}
               </div>
-              <div className="flex justify-center mt-5">
+              <div className="flex  justify-center items-center gap-2 mt-5">
                 <button
                   className="px-5 py-1.5 md:text-white text-primary text-base rounded-full md:bg-primary bg-gray-50 md:hover:bg-primary-hover"
                 >
                   Login
                 </button>
+                <p className="text-2xl">/</p>
+            <button
+                  className="px-5 py-1.5 md:text-white text-primary text-base rounded-full md:bg-primary bg-gray-50 md:hover:bg-primary-hover"
+               onClick={handlesguest}
+               >
+                Sign in as Guest
+                </button>
+            
               </div>
             </form>
             <p className="text-sm text-center mt-3">
@@ -159,6 +171,7 @@ const Login = ({ setToken }) => {
                 Sign Up
               </span>
             </p>
+           
           </div>
         </div>
       </div>
