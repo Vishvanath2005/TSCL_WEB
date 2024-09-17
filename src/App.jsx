@@ -28,7 +28,7 @@ function App() {
           <Route path="" element={<Login />} />
           <Route path="/auth" element={<OTP />} />
           <Route path="/signup" element={<SignUp />} />
-          <Route path="/guest" element={<Guestform/>}/>
+          {/* <Route path="/guest" element={<Guestform/>}/> */}
           <Route path="/" element={<Layout />}>
             <Route path="/closed" element={<Closed />} />
             <Route path="/form" element={<GrievancesForm />} />

@@ -155,13 +155,13 @@ const Login = ({ setToken }) => {
                 >
                   Login
                 </button>
-                <p className="text-2xl">/</p>
+                {/* <p className="text-2xl">/</p>
             <button
                   className="px-5 py-1.5 md:text-white text-primary text-base rounded-full md:bg-primary bg-gray-50 md:hover:bg-primary-hover"
                onClick={handlesguest}
                >
                 Sign in as Guest
-                </button>
+                </button> */}
             
               </div>
             </form>
