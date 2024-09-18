@@ -35,7 +35,7 @@ const SignUp = () => {
 
 
   const handleSignIn = () => {
-    navigate("/");
+    navigate("/report");
   };
 
   return (
