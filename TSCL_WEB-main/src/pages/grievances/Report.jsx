@@ -5,6 +5,9 @@ import { API, formatDate } from "../../Host";
 import axios from "axios";
 import { FaPlus } from "react-icons/fa6";
 import decryptData from "../../Decrypt";
+import { useSelector } from "react-redux";
+import logo from '../../assets/images/logo.png'
+
 
 const Report = () => {
   const [searchValue, setSearchValue] = useState("");
@@ -18,6 +21,9 @@ const Report = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState("All");
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
+  const [grievanceImages, setGrievanceImages] = useState({});
 
   const token = sessionStorage.getItem("token");
   const code = sessionStorage.getItem("code");
@@ -26,7 +32,7 @@ const Report = () => {
   useEffect(() => {
     fetchReports();
     fetchActiveStatus();
-  }, [searchValue, currentPage, itemsPerPage, selectedStatus]);
+  }, [searchValue, currentPage, itemsPerPage, selectedStatus, fromDate, toDate]);
 
   const fetchReports = async () => {
     try {
@@ -40,23 +46,34 @@ const Report = () => {
       const responseData = decryptData(response.data.data);
       setReport(responseData);
 
+      // Filter reports based on search, selected status, and date range
       const filteredReports = responseData.filter((report) => {
         const statusMatch =
           selectedStatus === "All" || report.status === selectedStatus;
 
-        return (
-          statusMatch &&
-          Object.values(report).some((value) =>
-            value.toString().toLowerCase().includes(searchValue.toLowerCase())
-          )
+        const searchMatch = Object.values(report).some((value) =>
+          value.toString().toLowerCase().includes(searchValue.toLowerCase())
         );
+
+        // Date range filter
+        const reportDate = new Date(report.createdAt);
+        const fromDateMatch = fromDate ? reportDate >= new Date(fromDate) : true;
+        const toDateMatch = toDate ? reportDate <= new Date(toDate) : true;
+
+        return statusMatch && searchMatch && fromDateMatch && toDateMatch;
       });
 
-      setTotalPages(Math.ceil(filteredReports.length / itemsPerPage));
+      // Sort reports by date
+      const sortedReports = filteredReports.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+
+      // Paginate the sorted reports
+      setTotalPages(Math.ceil(sortedReports.length / itemsPerPage));
       const lastIndex = currentPage * itemsPerPage;
       const firstIndex = lastIndex - itemsPerPage;
 
-      setCurrentItems(filteredReports.slice(firstIndex, lastIndex));
+      setCurrentItems(sortedReports.slice(firstIndex, lastIndex));
       setIsLoading(false);
     } catch (err) {
       console.error(err);
@@ -64,6 +81,19 @@ const Report = () => {
       setIsLoading(false);
     }
   };
+
+  const Origin = useSelector((state) => state.origin);
+
+  useEffect(() => {
+    if (Origin && Origin?.data) {
+      const imageMapping = Origin?.data?.reduce((acc, resource) => {
+        acc[resource.res_name] = resource.image;
+        return acc;
+      }, {});
+      setGrievanceImages(imageMapping);
+    }
+  }, [Origin]);
+
 
   const fetchActiveStatus = async () => {
     try {
@@ -104,21 +134,7 @@ const Report = () => {
       <div className="font-lexend h-screen">
         <div className="flex justify-between items-center my-2 mx-8 gap-1 flex-wrap">
           <h1 className="md:text-xl text-lg font-bold">Dashboard</h1>
-          <div className="flex items-center gap-3 mx-3">
-            <label htmlFor="itemsPerPage" className="font-medium text-gray-600">
-              Page Entries
-            </label>
-            <select
-              id="itemsPerPage"
-              value={itemsPerPage}
-              onChange={handleItemsPerPageChange}
-              className="p-1 outline-none text-sm rounded px-2"
-            >
-              {[5, 10, 20, 50].map((num) => (
-                <option key={num} value={num}>{num}</option>
-              ))}
-            </select>
-          </div>
+
           <button
             className="flex  flex-row-2 gap-2 font-medium font-lexend items-center border-2 bg-blue-500 text-white rounded-full py-2 px-3 justify-between md:text-base text-sm"
             onClick={() =>
@@ -133,9 +149,53 @@ const Report = () => {
 
         <div className="bg-white h-4/5 mx-3 rounded-lg p-3">
           <div className="flex justify-between items-center gap-6 mt-2 mx-3">
-            <p className="text-lg whitespace-nowrap">View Report</p>
+            <div className="flex items-center gap-3 mx-3">
+              <div className=" flex items-center gap-10">
+                <p className="text-lg whitespace-nowrap">View Report</p>
+
+                <div className="border-2 border-blue-700 px-2 py-1 flex gap-3 rounded-lg">
+                  <label
+                    htmlFor="itemsPerPage"
+                    className="font-medium text-gray-600"
+                  >
+                    Page Entries:
+                  </label>
+
+                  <select
+                    id="itemsPerPage"
+                    value={itemsPerPage}
+                    onChange={handleItemsPerPageChange}
+                    className="p-1 outline-none border bg-blue-500 text-white text-sm rounded-lg px-2"
+                  >
+                    {[5, 10, 20, 50].map((num) => (
+                      <option key={num} value={num}>
+                        {num}
+                      </option>
+                    ))}
+                  </select>
+                </div><div className="flex items-center gap-3 mx-3">
+            <label htmlFor="fromDate" className="font-medium text-gray-600">From Date:</label>
+            <input
+              type="date"
+              id="fromDate"
+              value={fromDate}
+              onChange={(e) => setFromDate(e.target.value)}
+              className="border-2 p-1 rounded-lg"
+            />
+
+            <label htmlFor="toDate" className="font-medium text-gray-600">To Date:</label>
+            <input
+              type="date"
+              id="toDate"
+              value={toDate}
+              onChange={(e) => setToDate(e.target.value)}
+              className="border-2 p-1 rounded-lg"
+            />
+          </div>
+              </div>
+            </div>
             <select
-              className="block w-fit px-1 py-2 text-center text-sm bg-primary text-white border border-none rounded-full hover:border-gray-200 outline-none capitalize"
+              className="block items-center w-fit px-1 py-2 text-center text-sm bg-primary text-white border border-none rounded-full hover:border-gray-200 outline-none capitalize"
               onChange={(e) => handleStatusChange(e.target.value)}
               value={selectedStatus || ""}
             >
@@ -147,34 +207,46 @@ const Report = () => {
                 </option>
               ))}
             </select>
+            
           </div>
+          
 
-          <div className="rounded-lg py-3 overflow-x-auto no-scrollbar">
-            <table className="w-full mt-3">
-              <thead className="border-b border-gray-300">
-                <tr>
-                  {[
-                    "Complaint No",
-                    "Date and Time",
-                    "Raised by",
-                    "Department",
-                    "Priority",
-                    "Status",
-                  ].map((header) => (
-                    <th key={header} className="text-start font-lexend font-semibold whitespace-nowrap">
-                      <p className="mx-1.5 my-2 flex gap-2 items-center">
-                        {header} <RiExpandUpDownLine />
+          <div className="rounded-lg py-3 overflow-x-auto no-scrollbar flex justify-center">
+            <div className="w-full overflow-y-auto max-h-[540px]">
+              <table className="w-full mt-3 max-w-6xl">
+                <thead className="border-b border-gray-300">
+                  <tr>
+                    {[ 
+                      "Complaint No",
+                      "Date and Time",
+                      "Origin",
+                      "Raised by",
+                      "Department", 
+                      "Assigned JE",
+                    ].map((header) => (
+                      <th
+                        key={header}
+                        className="items-center font-lexend font-semibold whitespace-nowrap"
+                      >
+                        <p className="mx-1.5 my-2 flex gap-2 items-center">
+                          {header} <RiExpandUpDownLine />
+                        </p>
+                      </th>
+                    ))}
+                   
+                    <th className="text-center font-semibold py-2">
+                      <p className="mx-7 my-2 flex gap-2 items-center">
+                        Status <RiExpandUpDownLine />
                       </p>
                     </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {currentItems
-                  .slice()
-                  .reverse()
-                  .map((report, index) => (
-                    <tr key={index} className="border-b border-gray-300">
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentItems.map((report, index) => (
+                    <tr
+                      key={index}
+                      className="border-b overflow-y-auto border-gray-300"
+                    >
                       <td>
                         <p
                           className="border-2 w-28 border-black rounded-lg text-center py-1 my-1"
@@ -187,23 +259,31 @@ const Report = () => {
                           {report.grievance_id}
                         </p>
                       </td>
-                      <td className="text-start mx-1.5 my-2 font-lexend text-sm">{formatDate(report.createdAt)}</td>
-                      <td className="text-start mx-1.5 my-2 font-lexend text-sm">{report.public_user_name}</td>
-                      <td className="text-start mx-1.5 my-2 font-lexend text-sm">{report.dept_name}</td>
-                      <td>
-                        <p
-                          className={`border-2 w-26 rounded-full text-center py-1.5 mx-2 text-sm font-medium capitalize ${
-                            report.priority === "High"
-                              ? "text-red-500 border-red-500"
-                              : report.priority === "Medium"
-                              ? "text-sky-500 border-sky-500"
-                              : "text-green-500 border-green-500"
-                          }`}
-                        >
-                          {report.priority}
-                        </p>
+                      
+                      <td className="text-start mx-1.5 my-2 font-lexend text-sm">
+                        {formatDate(report.createdAt)}
+                      </td><td className="text-start flex justify-start  font-lexend text-sm">
+                      <img
+                        src={grievanceImages[report.grievance_mode] || logo}
+                        alt={report.grievance_mode}
+                        className="w-14 h-5 mx-1.5 my-2 rounded-full"
+                      />
+                      </td>
+                      <td className="text-start mx-1.5 my-2 font-lexend text-sm">
+                        {report.public_user_name}
+                      </td>
+                      <td className="text-start mx-1.5 my-2 font-lexend text-sm">
+                        {report.dept_name}
                       </td>
                       <td>
+                      {" "}
+                      <p className=" text-start mx-1.5  my-2 font-lexend whitespace-nowrap text-sm capitalize text-gray-700">
+                        {report.assign_username
+                          ? report.assign_username
+                          : "Yet to be assigned"}
+                      </p>
+                    </td>
+                      <td className="text-center">
                         <p
                           className="border-2 w-28 rounded-full text-center py-1 text-sm mx-2 capitalize"
                           style={{
@@ -216,15 +296,18 @@ const Report = () => {
                       </td>
                     </tr>
                   ))}
-              </tbody>
-            </table>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 
         <div className="mt-4 mb-5 mx-7">
           <nav className="flex items-center flex-column flex-wrap md:flex-row md:justify-between justify-center">
             <span className="text-sm font-normal text-gray-700 mb-4 md:mb-0 block w-full md:inline md:w-auto text-center font-alegerya">
-              Showing {currentPage * itemsPerPage - itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, report.length)} of {report.length} entries
+              Showing {currentPage * itemsPerPage - itemsPerPage + 1} to{" "}
+              {Math.min(currentPage * itemsPerPage, report.length)} of{" "}
+              {report.length} entries
             </span>
             <ul className="inline-flex -space-x-px rtl:space-x-reverse text-sm h-8 font-alegerya">
               <li>
@@ -246,7 +329,10 @@ const Report = () => {
                 </button>
               </li>
               {Array.from({ length: totalPages }, (_, i) => i + 1)
-                .slice(Math.max(0, currentPage - 2), Math.min(totalPages, currentPage + 1))
+                .slice(
+                  Math.max(0, currentPage - 2),
+                  Math.min(totalPages, currentPage + 1)
+                )
                 .map((number) => (
                   <li key={number}>
                     <button

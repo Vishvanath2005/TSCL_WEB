@@ -1,11 +1,13 @@
 import axios from "axios";
 import React, { useState, useEffect, Fragment } from "react";
-import { API, formatDate1 } from "../../Host";
+import { API, formatDate1, formatDate2 } from "../../Host";
 import { useLocation, useNavigate } from "react-router-dom";
 import decryptData from "../../Decrypt";
 import ViewAttachment from "./ViewAttachment";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import SimilarReq from "../grievances/SimilarRequest";
+import { IoIosEye } from "react-icons/io";
+import GrievanceDetailsModal from "./GrievanceDetailsModal";
 
 const ViewRequest = () => {
   const [data, setData] = useState(null);
@@ -23,6 +25,8 @@ const ViewRequest = () => {
   const [attachmentFile, setAttachmentFile] = useState(null);
   const [logData, setLogData] = useState([]);
   const navigate = useNavigate();
+  const [selectedGrievanceId, setSelectedGrievanceId] = useState(null);
+  const [isGrievanceModalOpen, setIsGrievanceModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -127,6 +131,12 @@ const ViewRequest = () => {
 
   const togglReModal = () => {
     setIsSimilarReq(!setIsSimilarReq);
+  };
+
+
+  const handleGrievanceClick = (grievanceId) => {
+    setSelectedGrievanceId(grievanceId);
+    setIsGrievanceModalOpen(true);
   };
 
   return (
@@ -254,22 +264,25 @@ const ViewRequest = () => {
               <div className="md:col-span-6 col-span-12 border px-2 py-3 rounded ">
                 <p className="pt-2 text-lg ">Similar Request</p>
                 <hr className="my-3 w-full" />
-                <div className="overflow-auto no-scrollbar" onClick={()=>setIsSimilarReq(true)}>
+                <div className="overflow-auto no-scrollbar">
                   <table className="w-full bg-gray-200 rounded ">
                     <thead>
                       <tr>
                         <th className="items-center mx-3 py-2 font-lexend whitespace-nowrap">
-                          Date/Time
+                          Grievance
                         </th>
                         <th className="items-center mx-3 py-2 font-lexend whitespace-nowrap">
-                          Complaint No
+                          Department
                         </th>
                         <th className="items-center mx-3 py-2 font-lexend whitespace-nowrap">
-                          Status
+                          Origin
                         </th>
-                        {/* <th className="items-center mx-3 py-2 font-lexend whitespace-nowrap">
-                         Action
-                        </th> */}
+                        <th className="items-center mx-3 py-2 font-lexend whitespace-nowrap">
+                          Date
+                        </th>
+                        <th className="items-center mx-3 py-2 font-lexend whitespace-nowrap">
+                          Action
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-300">
@@ -279,29 +292,31 @@ const ViewRequest = () => {
                             className="border-b-2 border-gray-300"
                             key={index}
                           >
-                            <td className="text-center mx-3 py-2.5 whitespace-nowrap">
-                              {formatDate1(data.createdAt)}
-                            </td>
-                            <td className="text-center mx-3 py-2.5 whitespace-nowrap">
+                            <td
+                              className="text-center mx-3 py-2.5 whitespace-nowrap"
+                              onClick={() =>
+                                handleGrievanceClick(data.grievance_id)
+                              }
+                            >
                               {data.grievance_id}
                             </td>
-                            <td className="text-center mx-3 py-2.5 text-green-600 whitespace-nowrap capitalize">
-                              {data.status}
+                            <td className="text-center mx-3 py-2.5 whitespace-nowrap text-gray-600 capitalize">
+                              {data.dept_name}
                             </td>
-                            {/* <td>
-                              <div
-                                className="mx-3 my-3 whitespace-nowrap"
+                            <td className="text-center mx-3 py-2.5 whitespace-nowrap text-gray-600 capitalize">
+                              {data.grievance_mode}
+                            </td>
+                            <td className="text-center mx-3 py-2.5 whitespace-nowrap text-gray-600 ">
+                              {formatDate2(data.createdAt)}
+                            </td>
+                            <td className="flex justify-center mt-3">
+                              <IoIosEye
+                                className="text-xl"
                                 onClick={() =>
-                                  navigate(`/view`, {
-                                    state: {
-                                      grievanceId: data.grievance_id,
-                                    },
-                                  })
+                                  handleGrievanceClick(data.grievance_id)
                                 }
-                              >
-                                <BsThreeDotsVertical />
-                              </div>
-                            </td> */}
+                              />
+                            </td>
                           </tr>
                         ))
                       ) : (
@@ -316,109 +331,14 @@ const ViewRequest = () => {
                 </div>
               </div>
             </div>
-            <div className="mx-3 my-3">
-              <p className="mb-2 mx-1 text-lg">Complaint History</p>
-              <div className="bg-gray-100 py-3 h-[530px]">
-                <div className="mx-8 ">
-                  <p className="py-3 font-semibold">
-                    Complaint No {data.grievance_id}
-                  </p>
-                  <div className="h-[380px]  overflow-x-auto no-scrollbar mb-3">
-                    {logData &&
-                      logData
-                        .slice()
-                        .reverse()
-                        .map((logEntry, index) => (
-                          <div key={index}>
-                            <p className="py-1">
-                              {new Date(
-                                logEntry.createdAt
-                              ).toLocaleDateString()}
-                            </p>
-                            <div className="grid grid-cols-3 divide-x-2 divide-black">
-                              <p>
-                                {new Date(
-                                  logEntry.createdAt
-                                ).toLocaleTimeString([], {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                  hour12: true,
-                                })}
-                              </p>
-                              <p className="pl-5 col-span-2">
-                                {logEntry.log_details}
-                              </p>
-                            </div>
-                            <br />
-                          </div>
-                        ))}
-
-                    <p className="py-2">
-                      {new Date(data.createdAt).toLocaleDateString()}
-                    </p>
-                    <div className="grid grid-cols-3 divide-x-2 divide-black">
-                      <p>
-                        {new Date(data.createdAt).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          hour12: true,
-                        })}
-                      </p>
-                      <p className="pl-5 col-span-2">
-                        {" "}
-                        Assigned To Particular {data.dept_name} Department
-                      </p>
-                    </div>
-                    <br />
-                    <div className="grid grid-cols-3 divide-x-2 divide-black">
-                      <p>
-                        {new Date(data.createdAt).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          hour12: true,
-                        })}
-                      </p>
-                      <p className="pl-5 col-span-2">
-                        Ticket Raised- {data.grievance_id}
-                      </p>
-                    </div>
-                    <br />
-                    {workDataFile && workDataFile.length > 0 && (
-                      <div className="grid grid-cols-4">
-                        <p className="col-span-2">Attachment Files </p>
-                        <div className="col-start-1 col-span-4 mt-2 text-xs  ">
-                          {workDataFile.map((file, index) => (
-                            <button
-                              className=" mx-1 my-1 px-3 py-1.5 bg-gray-500 rounded-full text-white"
-                              key={index}
-                              onClick={() => {
-                                setIsviewModal(true);
-                                setAttachmentFile(file.attachment);
-                                setEndpoint("grievance-worksheet-attachment")
-                              }}
-                            >
-                              {`Attachment ${index + 1}`}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  
-                  <hr className="my-3" />
-                  <div className="md:grid md:grid-cols-3 flex border-2 md:mx-20">
-                    <p className="text-center px-3 py-1.5">Status</p>
-                    <p className="text-center w-full bg-gray-800 md:col-span-2 text-white py-1.5">
-                      {data.status}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
-      </div>
+      </div> {isGrievanceModalOpen && (
+        <GrievanceDetailsModal
+          grievanceId={selectedGrievanceId}
+          closeModal={() => setIsGrievanceModalOpen(false)}
+        />
+      )}
       {isviewModal && (
         <ViewAttachment
         endpoint={endpoint}
