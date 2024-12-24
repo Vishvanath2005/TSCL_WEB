@@ -5,15 +5,16 @@ import { useLocation, useNavigate } from "react-router-dom";
 import decryptData from "../../Decrypt";
 import ViewAttachment from "./ViewAttachment";
 import { BsThreeDotsVertical } from "react-icons/bs";
-import SimilarReq from "../grievances/SimilarRequest";
+import SimilarRequest from "../grievances/SimilarRequest";
 import { IoIosEye } from "react-icons/io";
 import GrievanceDetailsModal from "./GrievanceDetailsModal";
+import { toast } from "react-toastify";
 
 const ViewRequest = () => {
   const [data, setData] = useState(null);
   const [dataFile, setDataFile] = useState(null);
   const [workDataFile, setWorkDataFile] = useState(null);
-  const [endpoint, setEndpoint] = useState(null)
+  const [endpoint, setEndpoint] = useState(null);
   const [matchData, setMatchData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -29,6 +30,12 @@ const ViewRequest = () => {
   const [isGrievanceModalOpen, setIsGrievanceModalOpen] = useState(false);
 
   useEffect(() => {
+    if (!grievanceId) {
+      setError(new Error("Grievance ID is not available"));
+      setLoading(false);
+      return;
+    }
+
     const fetchData = async () => {
       try {
         const response = await axios.get(
@@ -41,7 +48,8 @@ const ViewRequest = () => {
         );
         const responseData = decryptData(response.data.data);
         setData(responseData);
-        const responsefilter = await axios.get(
+
+        const responseFilter = await axios.get(
           `${API}/new-grievance/filter?zone_name=${responseData.zone_name}&ward_name=${responseData.ward_name}&street_name=${responseData.street_name}&dept_name=${responseData.dept_name}&complaint=${responseData.complaint}`,
           {
             headers: {
@@ -49,15 +57,14 @@ const ViewRequest = () => {
             },
           }
         );
-        const data = decryptData(responsefilter.data.data);
-        const filteredData = data.filter(item => item.grievance_id !== grievanceId);
+        const filterData = decryptData(responseFilter.data.data);
+        const filteredData = filterData.filter((item) => item.grievance_id !== grievanceId);
         setMatchData(filteredData);
       } catch (err) {
         setError(err);
-      } finally {
-        setLoading(false);
       }
     };
+
     const fetchDataFile = async () => {
       try {
         const response = await axios.get(
@@ -72,11 +79,11 @@ const ViewRequest = () => {
         setDataFile(responseData);
       } catch (err) {
         setError(err);
-      } finally {
-        setLoading(false);
       }
     };
 
+
+    
     const fetchLog = async () => {
       try {
         const response = await axios.get(
@@ -91,10 +98,9 @@ const ViewRequest = () => {
         setLogData(responseData);
       } catch (err) {
         setError(err);
-      } finally {
-        setLoading(false);
       }
     };
+
     const fetchDataFileWorksheet = async () => {
       try {
         const response = await axios.get(
@@ -109,16 +115,110 @@ const ViewRequest = () => {
         setWorkDataFile(responseData);
       } catch (err) {
         setError(err);
-      } finally {
-        setLoading(false);
       }
     };
 
-    fetchData();
-    fetchDataFile();
-    fetchLog();
-    fetchDataFileWorksheet();
-  }, []);
+    setLoading(true);
+    Promise.all([fetchData(), fetchDataFile(), fetchLog(), fetchDataFileWorksheet()])
+      .then(() => setLoading(false))
+      .catch((err) => {
+        setError(err);
+        setLoading(false);
+      });
+  }, [grievanceId, token]);
+
+  const fetchLog = async () => {
+    try {
+      const response = await axios.get(
+        `${API}/grievance-log/getbyid?grievance_id=${grievanceId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const responseData = decryptData(response.data.data);
+      setLogData(responseData);
+    } catch (err) {
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(
+        `${API}/new-grievance/getbyid?grievance_id=${grievanceId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const responseData = decryptData(response.data.data);
+      setData(responseData);
+      const responsefilter = await axios.get(
+        `${API}/new-grievance/filter?zone_name=${responseData.zone_name}&ward_name=${responseData.ward_name}&street_name=${responseData.street_name}&dept_name=${responseData.dept_name}&complaint=${responseData.complaint}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = decryptData(responsefilter.data.data);
+      const filteredData = data.filter(
+        (item) => item.grievance_id !== grievanceId
+      );
+      setMatchData(filteredData);
+    } catch (err) {
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleReOpen = async () => {
+    try {
+      const response = await axios.post(
+        `${API}/new-grievance/reopen?grievance_id=${grievanceId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        toast.success("Ticket Re-Opened Successfully");
+        await axios.post(
+          `${API}/grievance-log/post`,
+          {
+            grievance_id: grievanceId,
+            log_details: `Ticket No ${grievanceId} is Re-Opened by ${localStorage.getItem(
+              "name"
+            )}`,
+            created_by_user: localStorage.getItem("name"),
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        fetchData()
+        fetchLog()
+        navigate('/closed')
+      } else {
+        toast.error("Failed ");
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+      toast.error("An error occurred while sending the message.");
+    }
+  };
+
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
@@ -133,7 +233,6 @@ const ViewRequest = () => {
     setIsSimilarReq(!setIsSimilarReq);
   };
 
-
   const handleGrievanceClick = (grievanceId) => {
     setSelectedGrievanceId(grievanceId);
     setIsGrievanceModalOpen(true);
@@ -143,7 +242,29 @@ const ViewRequest = () => {
     <Fragment>
       <div className="h-screen overflow-y-auto no-scrollbar">
         <div className="md:mx-6 mx-2  my-5 font-lexend">
-          <p>Complaint Details #{data.grievance_id}</p>
+         <div className="flex justify-between items-center">
+         <p>Complaint Details #{data.grievance_id}</p>
+          {data.status === "closed" &&
+              (() => {
+                const createdAt = new Date(data.createdAt);
+                const today = new Date();
+                const timeDifference = today - createdAt; 
+                const daysDifference = timeDifference / (1000 * 60 * 60 * 24);
+
+                return daysDifference <= 7 ? (
+                  <button className="bg-green-600 px-3 py-1.5 rounded-md shadow-md text-white text-sm"
+                  onClick={() => {
+                    const userConfirmed = window.confirm("Are you sure you want to Re-open the ticket?");
+                    if (userConfirmed) {
+                      handleReOpen();
+                    }
+                  }}
+                  >
+                    Re-open Ticket
+                  </button>
+                ) : null;
+              })()}
+         </div>
           <div className="bg-white mt-2 pb-3">
             <p className="px-5 py-2 text-lg">Request By :</p>
             <div className="flex justify-between gap-3 mx-3 my-3 items-center flex-wrap">
@@ -333,7 +454,8 @@ const ViewRequest = () => {
             </div>
           </div>
         </div>
-      </div> {isGrievanceModalOpen && (
+      </div> 
+      {isGrievanceModalOpen && (
         <GrievanceDetailsModal
           grievanceId={selectedGrievanceId}
           closeModal={() => setIsGrievanceModalOpen(false)}
@@ -341,13 +463,13 @@ const ViewRequest = () => {
       )}
       {isviewModal && (
         <ViewAttachment
-        endpoint={endpoint}
+          endpoint={endpoint}
           toggleModal={toggleModal}
           attachmentFile={attachmentFile}
         />
       )}
       {isSimilarReq && (
-        <SimilarReq matchData={matchData} togglReModal={togglReModal} />
+        <SimilarRequest matchData={matchData} togglReModal={togglReModal} />
       )}
     </Fragment>
   );

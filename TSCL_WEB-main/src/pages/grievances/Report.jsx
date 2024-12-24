@@ -5,9 +5,11 @@ import { API, formatDate } from "../../Host";
 import axios from "axios";
 import { FaPlus } from "react-icons/fa6";
 import decryptData from "../../Decrypt";
+import DateRangeComp from "../../components/DateRangeComp";
 import { useSelector } from "react-redux";
-import logo from '../../assets/images/logo.png'
-
+import logo from "../../assets/images/logo.png";
+import { addDays } from "date-fns";
+import { toast } from "react-toastify";
 
 const Report = () => {
   const [searchValue, setSearchValue] = useState("");
@@ -21,9 +23,10 @@ const Report = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState("All");
-  const [fromDate, setFromDate] = useState('');
-  const [toDate, setToDate] = useState('');
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
   const [grievanceImages, setGrievanceImages] = useState({});
+  const [filteredGrievances, setFilteredGrievances] = useState([]);
 
   const token = sessionStorage.getItem("token");
   const code = sessionStorage.getItem("code");
@@ -32,7 +35,14 @@ const Report = () => {
   useEffect(() => {
     fetchReports();
     fetchActiveStatus();
-  }, [searchValue, currentPage, itemsPerPage, selectedStatus, fromDate, toDate]);
+  }, [
+    searchValue,
+    currentPage,
+    itemsPerPage,
+    selectedStatus,
+    fromDate,
+    toDate,
+  ]);
 
   const fetchReports = async () => {
     try {
@@ -55,24 +65,25 @@ const Report = () => {
           value.toString().toLowerCase().includes(searchValue.toLowerCase())
         );
 
-        // Date range filter
         const reportDate = new Date(report.createdAt);
-        const fromDateMatch = fromDate ? reportDate >= new Date(fromDate) : true;
-        const toDateMatch = toDate ? reportDate <= new Date(toDate) : true;
+        const fromDateMatch = fromDate
+          ? reportDate >= new Date(fromDate)
+          : true;
+        const toDateMatch = toDate
+          ? reportDate <= addDays(new Date(toDate), 1)
+          : true;
 
         return statusMatch && searchMatch && fromDateMatch && toDateMatch;
       });
 
-      // Sort reports by date
+      // Sort and paginate the reports
       const sortedReports = filteredReports.sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
       );
 
-      // Paginate the sorted reports
       setTotalPages(Math.ceil(sortedReports.length / itemsPerPage));
       const lastIndex = currentPage * itemsPerPage;
       const firstIndex = lastIndex - itemsPerPage;
-
       setCurrentItems(sortedReports.slice(firstIndex, lastIndex));
       setIsLoading(false);
     } catch (err) {
@@ -93,7 +104,6 @@ const Report = () => {
       setGrievanceImages(imageMapping);
     }
   }, [Origin]);
-
 
   const fetchActiveStatus = async () => {
     try {
@@ -129,6 +139,13 @@ const Report = () => {
     setCurrentPage(1);
   };
 
+  const handleDateRangeChange = (range) => {
+    const { startDate, endDate } = range[0];
+    setFromDate(startDate);
+    setToDate(endDate);
+    toast.success("Grievance filtered");
+  };
+
   return (
     <div className="overflow-y-auto no-scrollbar">
       <div className="font-lexend h-screen">
@@ -153,6 +170,9 @@ const Report = () => {
               <div className=" flex items-center gap-10">
                 <p className="text-lg whitespace-nowrap">View Report</p>
 
+                <div className="flex items-center gap-3  border-2 w-fit py-1.5 rounded-lg border-primary pr-3 mx-3">
+                  <DateRangeComp onChange={handleDateRangeChange} />
+                </div>
                 <div className="border-2 border-blue-700 px-2 py-1 flex gap-3 rounded-lg">
                   <label
                     htmlFor="itemsPerPage"
@@ -173,25 +193,7 @@ const Report = () => {
                       </option>
                     ))}
                   </select>
-                </div><div className="flex items-center gap-3 mx-3">
-            <label htmlFor="fromDate" className="font-medium text-gray-600">From Date:</label>
-            <input
-              type="date"
-              id="fromDate"
-              value={fromDate}
-              onChange={(e) => setFromDate(e.target.value)}
-              className="border-2 p-1 rounded-lg"
-            />
-
-            <label htmlFor="toDate" className="font-medium text-gray-600">To Date:</label>
-            <input
-              type="date"
-              id="toDate"
-              value={toDate}
-              onChange={(e) => setToDate(e.target.value)}
-              className="border-2 p-1 rounded-lg"
-            />
-          </div>
+                </div>
               </div>
             </div>
             <select
@@ -207,21 +209,19 @@ const Report = () => {
                 </option>
               ))}
             </select>
-            
           </div>
-          
 
           <div className="rounded-lg py-3 overflow-x-auto no-scrollbar flex justify-center">
             <div className="w-full overflow-y-auto max-h-[540px]">
               <table className="w-full mt-3 max-w-6xl">
                 <thead className="border-b border-gray-300">
                   <tr>
-                    {[ 
+                    {[
                       "Complaint No",
                       "Date and Time",
                       "Origin",
                       "Raised by",
-                      "Department", 
+                      "Department",
                       "Assigned JE",
                     ].map((header) => (
                       <th
@@ -233,7 +233,7 @@ const Report = () => {
                         </p>
                       </th>
                     ))}
-                   
+
                     <th className="text-center font-semibold py-2">
                       <p className="mx-7 my-2 flex gap-2 items-center">
                         Status <RiExpandUpDownLine />
@@ -259,15 +259,16 @@ const Report = () => {
                           {report.grievance_id}
                         </p>
                       </td>
-                      
+
                       <td className="text-start mx-1.5 my-2 font-lexend text-sm">
                         {formatDate(report.createdAt)}
-                      </td><td className="text-start flex justify-start  font-lexend text-sm">
-                      <img
-                        src={grievanceImages[report.grievance_mode] || logo}
-                        alt={report.grievance_mode}
-                        className="w-14 h-5 mx-1.5 my-2 rounded-full"
-                      />
+                      </td>
+                      <td className="text-start flex justify-start  font-lexend text-sm">
+                        <img
+                          src={grievanceImages[report.grievance_mode] || logo}
+                          alt={report.grievance_mode}
+                          className="w-14 h-5 mx-1.5 my-2 rounded-full"
+                        />
                       </td>
                       <td className="text-start mx-1.5 my-2 font-lexend text-sm">
                         {report.public_user_name}
@@ -276,13 +277,13 @@ const Report = () => {
                         {report.dept_name}
                       </td>
                       <td>
-                      {" "}
-                      <p className=" text-start mx-1.5  my-2 font-lexend whitespace-nowrap text-sm capitalize text-gray-700">
-                        {report.assign_username
-                          ? report.assign_username
-                          : "Yet to be assigned"}
-                      </p>
-                    </td>
+                        {" "}
+                        <p className=" text-start mx-1.5  my-2 font-lexend whitespace-nowrap text-sm capitalize text-gray-700">
+                          {report.assign_username
+                            ? report.assign_username
+                            : "Yet to be assigned"}
+                        </p>
+                      </td>
                       <td className="text-center">
                         <p
                           className="border-2 w-28 rounded-full text-center py-1 text-sm mx-2 capitalize"
