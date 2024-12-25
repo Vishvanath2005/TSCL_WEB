@@ -211,7 +211,7 @@ const Report = () => {
             </select>
           </div>
 
-          <div className="rounded-lg py-3 overflow-x-auto no-scrollbar flex justify-center">
+          <div className="rounded-lg  overflow-x-auto no-scrollbar flex justify-center">
             <div className="w-full overflow-y-auto max-h-[540px]">
               <table className="w-full mt-3 max-w-6xl">
                 <thead className="border-b border-gray-300">

@@ -78,7 +78,7 @@ const Layout = () => {
               !open && "opacity-0"
             }`}
           >
-            Admin Panel
+            Public-User Panel
           </h1>
         </span>
 

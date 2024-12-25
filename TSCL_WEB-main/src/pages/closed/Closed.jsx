@@ -4,18 +4,24 @@ import { RiExpandUpDownLine } from "react-icons/ri";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { API, formatDate } from "../../Host";
 import axios from "axios";
+import logo from "../../assets/images/logo.png";
 import { FaPlus } from "react-icons/fa6";
 import decryptData from "../../Decrypt";
+import DateRangeComp from "../../components/DateRangeComp";
+import { toast } from "react-toastify";
 
 const Closed = () => {
   const [searchValue, setSearchValue] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
-  const[status, setStatus] = useState([]);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [status, setStatus] = useState([]);
   const [statusColors, setStatusColors] = useState({});
   const [currentItems, setCurrentItems] = useState([]);
   const [report, setReport] = useState([]);
+  const [grievanceImages, setGrievanceImages] = useState({});
+  const [fromDate, setFromDate] = useState(null);
+  const [toDate, setToDate] = useState(null);
   const token = sessionStorage.getItem("token");
   const code = sessionStorage.getItem("code");
   const navigate = useNavigate();
@@ -29,14 +35,26 @@ const Closed = () => {
       })
       .then((response) => {
         const responseData = decryptData(response.data.data);
-        setReport(responseData);
 
-        const filteredCenters = responseData.filter((report) =>
+        // Sort the data by createdAt in descending order
+        const sortedData = responseData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        // Apply date range filter
+        const filteredByDate = sortedData.filter((report) => {
+          const reportDate = new Date(report.createdAt);
+          if (fromDate && reportDate < new Date(fromDate)) return false;
+          if (toDate && reportDate > new Date(toDate)) return false;
+          return true;
+        });
+
+        // Apply search filter
+        const filteredCenters = filteredByDate.filter((report) =>
           Object.values(report).some((value) =>
             value.toString().toLowerCase().includes(searchValue.toLowerCase())
           )
         );
 
+        setReport(filteredByDate); // Update report with date-filtered data
         setTotalPages(Math.ceil(filteredCenters.length / itemsPerPage));
         const lastIndex = currentPage * itemsPerPage;
         const firstIndex = lastIndex - itemsPerPage;
@@ -46,8 +64,8 @@ const Closed = () => {
       .catch((error) => {
         console.error(error);
       });
-      fetchActiveStatus();
-  }, [searchValue, currentPage]);
+    fetchActiveStatus();
+  }, [searchValue, currentPage, itemsPerPage, fromDate, toDate]);
 
   const fetchActiveStatus = async () => {
     try {
@@ -64,7 +82,6 @@ const Closed = () => {
 
       setStatus(responseData);
       setStatusColors(colorMapping);
-      setStatus(responseData);
     } catch (err) {
       console.error("Error fetching existing ActiveStatus:", err);
     }
@@ -76,73 +93,90 @@ const Closed = () => {
     }
   };
 
-  const lastIndex = currentPage * itemsPerPage;
-  const firstIndex = lastIndex - itemsPerPage;
-  const filteredCenters = report.filter((report) =>
-    Object.values(report).some((value) =>
-      value.toString().toLowerCase().includes(searchValue.toLowerCase())
-    )
-  );
+  const handleItemsPerPageChange = (event) => {
+    setItemsPerPage(parseInt(event.target.value, 10));
+    setCurrentPage(1); 
+  }
 
-  const currentItemsOnPage = filteredCenters.slice(firstIndex, lastIndex);
+  const handleDateRangeChange = (range) => {
+    const { startDate, endDate } = range[0];
+    setFromDate(startDate);
+    setToDate(endDate);
+    toast.success("Date filtered applied!");
+  };
 
   return (
     <div className="overflow-y-auto no-scrollbar">
-      <div className="  font-lexend h-screen ">
-        <div className="bg-white h-4/5 mx-3 rounded-lg mt-5  p-3">
-          <div className="flex justify-between gap-6 mt-4 mx-3">
-            <div className="flex flex-wrap gap-3">
+      <div className="font-lexend h-screen">
+        <div className="bg-white h-4/5 mx-3 rounded-lg mt-5 p-3">
+          <div className="flex justify-between gap-6 mt-1.5 mx-3">
+            <div className="flex items-center flex-wrap gap-3">
               <p className="text-lg font-semibold whitespace-nowrap">
                 View Closed
               </p>
+              <div className="flex items-center gap-3 border-2 w-fit py-1.5 rounded-lg border-primary pr-3 mx-3">
+                <DateRangeComp onChange={handleDateRangeChange} />
+              </div>
+              <div className="border-2 h-fit border-blue-700 px-2 py-1 flex gap-3 rounded-lg">
+                <label
+                  htmlFor="itemsPerPage"
+                  className="font-medium text-gray-600"
+                >
+                  Page Entries:
+                </label>
+                <select
+                  id="itemsPerPage"
+                  value={itemsPerPage}
+                  onChange={handleItemsPerPageChange}
+                  className="p-1 outline-none h-fit w-fit border bg-blue-500 text-white text-sm rounded-lg px-2"
+                >
+                  {[5, 10, 20, 50].map((num) => (
+                    <option key={num} value={num}>
+                      {num}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
-          <div className=" rounded-lg  py-3 overflow-x-auto no-scrollbar">
-            <table className="w-full mt-3 ">
-              <thead className=" border-b border-gray-300  ">
-                <tr className="">
-                  <th>
-                    <p className="mx-1.5 my-2 text-start font-lexend font-semibold  whitespace-nowrap">
-                      Complaint No
-                    </p>
-                  </th>
-                  <th>
-                    <p className="flex gap-2 items-center justify-start mx-1.5 my-2 font-lexend font-semibold whitespace-nowrap">
-                      Date and Time <RiExpandUpDownLine />
-                    </p>
-                  </th>
-                  <th>
-                    <p className="flex gap-2 items-center justify-start mx-1.5 my-2 font-lexend font-semibold whitespace-nowrap">
-                      Raised by <RiExpandUpDownLine />
-                    </p>
-                  </th>
-                  <th>
-                    <p className="flex gap-2 items-center justify-start mx-1.5 my-2 font-lexend font-semibold whitespace-nowrap">
-                      Department
-                      <RiExpandUpDownLine />
-                    </p>
-                  </th>
-                  <th>
-                    <p className="flex gap-2 items-center justify-center mx-2 my-2 font-lexend font-medium  whitespace-nowrap">
-                      Priority <RiExpandUpDownLine />
-                    </p>
-                  </th>
-                  <th>
-                    <p className="flex gap-2 items-center justify-start mx-1.5 my-2 font-lexend font-semibold whitespace-nowrap">
-                      Status <RiExpandUpDownLine />
-                    </p>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentItemsOnPage
-                  .slice()
-                  .reverse()
-                  .map((report, index) => (
-                    <tr className=" border-b border-gray-300  " key={index}>
+          <div className="rounded-lg overflow-x-auto no-scrollbar flex justify-center">
+            <div className="w-full overflow-y-auto max-h-[540px]">
+              <table className="w-full mt-3 max-w-6xl">
+                <thead className="border-b border-gray-300">
+                  <tr>
+                    {[
+                      "Complaint No",
+                      "Date and Time",
+                      "Origin",
+                      "Raised by",
+                      "Department",
+                      "Assigned JE",
+                    ].map((header) => (
+                      <th
+                        key={header}
+                        className="items-center font-lexend font-semibold whitespace-nowrap"
+                      >
+                        <p className="mx-1.5 my-2 flex gap-2 items-center">
+                          {header} <RiExpandUpDownLine />
+                        </p>
+                      </th>
+                    ))}
+                    <th className="text-center font-semibold py-2">
+                      <p className="mx-7 my-2 flex gap-2 items-center">
+                        Status <RiExpandUpDownLine />
+                      </p>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentItems.map((report, index) => (
+                    <tr
+                      key={index}
+                      className="border-b overflow-y-auto border-gray-300"
+                    >
                       <td>
                         <p
-                          className="border-2 w-28 border-black rounded-lg text-center py-1 my-1  "
+                          className="border-2 w-28 border-black rounded-lg text-center py-1 my-1"
                           onClick={() =>
                             navigate(`/view`, {
                               state: { grievanceId: report.grievance_id },
@@ -152,127 +186,93 @@ const Closed = () => {
                           {report.grievance_id}
                         </p>
                       </td>
-                      <td>
-                        <p className=" text-start mx-1.5  my-2 font-lexend whitespace-nowrap text-sm">
-                          {formatDate(report.createdAt)}
-                        </p>
+                      <td className="text-start mx-1.5 my-2 font-lexend text-sm">
+                        {formatDate(report.createdAt)}
+                      </td>
+                      <td className="text-start flex justify-start font-lexend text-sm">
+                        <img
+                          src={grievanceImages[report.grievance_mode] || logo}
+                          alt={report.grievance_mode}
+                          className="w-14 h-5 mx-1.5 my-2 rounded-full"
+                        />
+                      </td>
+                      <td className="text-start mx-1.5 my-2 font-lexend text-sm">
+                        {report.public_user_name}
+                      </td>
+                      <td className="text-start mx-1.5 my-2 font-lexend text-sm">
+                        {report.dept_name}
                       </td>
                       <td>
-                        {" "}
-                        <p className=" text-start mx-1.5  my-2 font-lexend whitespace-nowrap text-sm">
-                          {report.public_user_name}
+                        <p className="text-start mx-1.5 my-2 font-lexend whitespace-nowrap text-sm capitalize text-gray-700">
+                          {report.assign_username
+                            ? report.assign_username
+                            : "Yet to be assigned"}
                         </p>
                       </td>
-                      <td>
-                        {" "}
-                        <p className=" text-start mx-1.5  my-2 font-lexend whitespace-nowrap text-sm">
-                          {report.dept_name}
+                      <td className="text-center">
+                        <p
+                          className="border-2 w-28 rounded-full text-center py-1 text-sm mx-2 capitalize"
+                          style={{
+                            borderColor:
+                              statusColors[report.status] || "gray",
+                            color: statusColors[report.status] || "black",
+                          }}
+                        >
+                          {report.status}
                         </p>
                       </td>
-                      <td>
-                      <p
-                        className={`border-2 w-26 rounded-full text-center py-1.5 mx-2 text-sm font-medium capitalize  ${
-                          report.priority === "High"
-                            ? "text-red-500 border-red-500"
-                            : report.priority === "Medium"
-                            ? "text-sky-500 border-sky-500"
-                            : report.priority === "Low"
-                            ? "text-green-500 border-green-500"
-                            : ""
-                        }`}
-                      >
-                        {report.priority}
-                      </p>
-                    </td>
-                    <td>
-                      <p
-                        className="border-2 w-28 rounded-full text-center py-1 tex-sm font-normal mx-2 capitalize  "
-                        style={{
-                          borderColor: statusColors[report.status] || "gray",
-                          color: statusColors[report.status] || "black",
-                          fontSize: 14,
-                        }}
-                      >
-                        {report.status}
-                      </p>
-                    </td>
                     </tr>
                   ))}
-              </tbody>
-            </table>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-        <div className=" mt-4 mb-5 mx-7">
+        <div className="mt-4 mb-5 mx-7">
           <nav
-            className="flex items-center flex-column flex-wrap md:flex-row md:justify-between justify-center "
+            className="flex items-center flex-column flex-wrap md:flex-row md:justify-between justify-center"
             aria-label="Table navigation"
           >
             <span className="text-sm font-normal text-gray-700 mb-4 md:mb-0 block w-full md:inline md:w-auto text-center font-alegerya">
               Showing{" "}
               <span className="text-gray-700">
-                {firstIndex + 1} to {Math.min(lastIndex, report.length)}
-              </span>{" "}
-              of <span className="text-gray-900">{report.length} entries</span>
+                {Math.min((currentPage - 1) * itemsPerPage + 1, report.length)}{" "}
+                to{" "}
+                {Math.min(currentPage * itemsPerPage, report.length)}{" "}
+                of {report.length} entries
+              </span>
             </span>
-            <ul className="inline-flex -space-x-px rtl:space-x-reverse text-sm h-8 font-alegerya">
-              <li>
-                <button
-                  onClick={() => paginate(1)}
-                  disabled={currentPage === 1}
-                  className="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-primary bg-paginate-bg border border-paginate-br rounded-s-lg hover:bg-paginate-bg hover:text-primary-hover"
-                >
-                  &lt;&lt;
-                </button>
-              </li>
-
+            <ul className="inline-flex items-center -space-x-px">
               <li>
                 <button
                   onClick={() => paginate(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-primary bg-paginate-bg border border-paginate-br hover:bg-paginate-bg hover:text-primary-hover"
+                  className="block px-3 py-2 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-100 hover:text-gray-700"
                 >
-                  Back
+                  Previous
                 </button>
               </li>
-
-              {Array.from({ length: totalPages }, (_, i) => i + 1)
-                .slice(
-                  Math.max(0, currentPage - 2),
-                  Math.min(totalPages, currentPage + 1)
-                )
-
-                .map((number) => (
-                  <li key={number}>
-                    <button
-                      onClick={() => paginate(number)}
-                      className={`flex items-center justify-center px-3 h-8 leading-tight border border-paginate-br hover:text-white hover:bg-primary ${
-                        currentPage === number
-                          ? "bg-primary text-white"
-                          : "bg-white text-black"
-                      }`}
-                    >
-                      {number}
-                    </button>
-                  </li>
-                ))}
-
+              {Array.from({ length: totalPages }, (_, index) => (
+                <li key={index}>
+                  <button
+                    onClick={() => paginate(index + 1)}
+                    className={`block px-3 py-2 leading-tight ${
+                      currentPage === index + 1
+                        ? "text-blue-600 bg-blue-50 border border-blue-300"
+                        : "text-gray-500 bg-white border border-gray-300"
+                    } hover:bg-gray-100 hover:text-gray-700`}
+                  >
+                    {index + 1}
+                  </button>
+                </li>
+              ))}
               <li>
                 <button
                   onClick={() => paginate(currentPage + 1)}
-                  disabled={lastIndex >= filteredCenters.length}
-                  className="flex items-center justify-center px-3 h-8 leading-tight text-primary bg-paginate-bg border border-paginate-br hover:bg-paginate-bg hover:text-primary-hover"
+                  disabled={currentPage === totalPages}
+                  className="block px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-gray-700"
                 >
                   Next
-                </button>
-              </li>
-
-              <li>
-                <button
-                  onClick={() => paginate(totalPages)}
-                  disabled={currentPage === totalPages}
-                  className="flex items-center justify-center px-3 h-8 leading-tight text-primary bg-paginate-bg border border-paginate-br rounded-e-lg hover:bg-paginate-bg hover:text-primary-hover"
-                >
-                  &gt;&gt;
                 </button>
               </li>
             </ul>
