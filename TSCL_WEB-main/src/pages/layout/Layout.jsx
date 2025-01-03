@@ -1,20 +1,7 @@
 import React, { useState, Suspense } from "react";
-import { useNavigate } from "react-router-dom";
 import { Outlet, NavLink, useLocation } from "react-router-dom";
-import { BsChevronDown } from "react-icons/bs";
 import { TiThMenu } from "react-icons/ti";
-import { FaUser } from "react-icons/fa";
-import { SiAwsorganizations } from "react-icons/si";
-import { RxHome } from "react-icons/rx";
-import { FaMapLocationDot } from "react-icons/fa6";
 import { TiLockClosed } from "react-icons/ti";
-import { IoMdSettings } from "react-icons/io";
-import { CiLogout } from "react-icons/ci";
-import { GoOrganization } from "react-icons/go";
-import { MdOutlineContactSupport } from "react-icons/md";
-import { BsShieldExclamation } from "react-icons/bs";
-import { MdOutlineAdminPanelSettings } from "react-icons/md";
-import { LuUserCircle2 } from "react-icons/lu";
 import { TbFileReport } from "react-icons/tb";
 import Header from "../layout/Header";
 import logo from "../../assets/images/logo1.png";
@@ -25,34 +12,16 @@ const Layout = () => {
   const [submenuopen, Setsubmenuopen] = useState(false);
  
   const Menus = [
-    // { title: "Dashboard", icon: <RxHome />, to:"/dashboard"},
-    // { title: "Organization", icon: <GoOrganization />, to: "/organization" },
-    // { title: "Department", icon: <SiAwsorganizations />, to: "/department" },
-    // {
-    //   title: "Locality",
-    //   icon: <FaMapLocationDot />,
-    //   submenu: true,
-     
-    //   submenuItems: [
-    //     { title: "Zone", to: "/zone" },
-    //     { title: "Ward", to: "/ward" },
-    //     { title: "Street", to: "/street"},
-    //   ],
-    // },
-    // { title: "Complaint", icon: <MdOutlineContactSupport />, to: "/complaint" },
-    // { title: "Complaint Type", icon: <LuUserCircle2 />, to: "/complainttype" },
-    // { title: "Grievances", icon: <BsShieldExclamation />, to: "/grievances" },
+   
     { title: "My Report", icon: <TbFileReport />, to: "/report" },
     { title: "Closed", icon: <TiLockClosed />, to: "/closed" },
-    // { title: "Public User", icon: <LuUserCircle2 />, to: "/user" },
-    // { title: "Setting", icon: <IoMdSettings />, to: "/setting" },
    
   ];
   
 
 
   return (
-    <div className="w-full h-screen relative z-0 md:flex">
+    <div className="w-full h-screen relative  md:flex">
     
       <div
         className={` md:relative md:grid md:grid-rows-12 absolute   transition-all duration-100 ${
@@ -111,15 +80,6 @@ const Layout = () => {
                         {menu.title}
                       </span>
                     </div>
-
-                    {menu.submenu && open && (
-                      <BsChevronDown
-                        className={`cursor-pointer transition-transform delay-100  ${
-                          submenuopen && "rotate-180"
-                        }`}
-                        onClick={() => Setsubmenuopen(!submenuopen)}
-                      />
-                    )}
                   </li>
                 </NavLink>
                 {menu.submenu && submenuopen && open && (

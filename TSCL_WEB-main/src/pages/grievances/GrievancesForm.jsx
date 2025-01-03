@@ -628,13 +628,13 @@ const GrievancesForm = () => {
                   type="text"
                   id="complaint_address"
                   className="w-full text-start border-2  rounded-lg  px-2 py-2 outline-none"
-                  placeholder="complaint_address"
+                  placeholder="Enter your address"
                   {...register("complaint_address")}
-                  defaultValue={autoFillData ? autoFillData.complaint_address : ""}
+                  defaultValue={autoFillData ? autoFillData.address : ""}
                 />
-                {errors.complaint_address && (
+                {errors.address && (
                   <p className="text-red-500 text-xs text-start px-2 pt-2">
-                    {errors.complaint_address.message}
+                    {errors.address.message}
                   </p>
                 )}
               </div>

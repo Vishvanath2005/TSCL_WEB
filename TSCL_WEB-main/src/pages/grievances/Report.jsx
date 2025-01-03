@@ -147,8 +147,8 @@ const Report = () => {
   };
 
   return (
-    <div className="overflow-y-auto no-scrollbar">
-      <div className="font-lexend h-screen">
+    <div className="overflow-y-auto  no-scrollbar">
+      <div className="font-lexend h-screen ">
         <div className="flex justify-between items-center my-2 mx-8 gap-1 flex-wrap">
           <h1 className="md:text-xl text-lg font-bold">Dashboard</h1>
 
@@ -211,9 +211,9 @@ const Report = () => {
             </select>
           </div>
 
-          <div className="rounded-lg  overflow-x-auto no-scrollbar flex justify-center">
+          <div className="rounded-lg w-full overflow-x-auto no-scrollbar flex justify-center">
             <div className="w-full overflow-y-auto max-h-[540px]">
-              <table className="w-full mt-3 max-w-6xl">
+              <table className="w-full mt-3 ">
                 <thead className="border-b border-gray-300">
                   <tr>
                     {[

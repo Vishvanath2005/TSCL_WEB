@@ -106,7 +106,7 @@ const Closed = () => {
   };
 
   return (
-    <div className="overflow-y-auto no-scrollbar">
+    <div className="overflow-y-auto z-10 no-scrollbar">
       <div className="font-lexend h-screen">
         <div className="bg-white h-4/5 mx-3 rounded-lg mt-5 p-3">
           <div className="flex justify-between gap-6 mt-1.5 mx-3">
@@ -141,7 +141,7 @@ const Closed = () => {
           </div>
           <div className="rounded-lg overflow-x-auto no-scrollbar flex justify-center">
             <div className="w-full overflow-y-auto max-h-[540px]">
-              <table className="w-full mt-3 max-w-6xl">
+              <table className="w-full mt-3 ">
                 <thead className="border-b border-gray-300">
                   <tr>
                     {[

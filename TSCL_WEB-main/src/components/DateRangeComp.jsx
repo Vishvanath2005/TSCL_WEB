@@ -52,7 +52,7 @@ const DateRangeComp = ({ onChange }) => {
   };
 
   return (
-    <div className="relative">
+    <div className="relative ">
       <input
         value={
           range[0].startDate && range[0].endDate
