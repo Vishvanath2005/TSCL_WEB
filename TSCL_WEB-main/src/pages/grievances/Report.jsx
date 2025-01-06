@@ -7,7 +7,7 @@ import { FaPlus } from "react-icons/fa6";
 import decryptData from "../../Decrypt";
 import DateRangeComp from "../../components/DateRangeComp";
 import { useSelector } from "react-redux";
-import logo from "../../assets/images/logo.png";
+import logo from "../../assets/images/logo1.png";
 import { addDays } from "date-fns";
 import { toast } from "react-toastify";
 
@@ -267,7 +267,7 @@ const Report = () => {
                         <img
                           src={grievanceImages[report.grievance_mode] || logo}
                           alt={report.grievance_mode}
-                          className="w-14 h-5 mx-1.5 my-2 rounded-full"
+                          className="w-7 h-7 mx-1.5 my-2 rounded-full"
                         />
                       </td>
                       <td className="text-start mx-1.5 my-2 font-lexend text-sm">

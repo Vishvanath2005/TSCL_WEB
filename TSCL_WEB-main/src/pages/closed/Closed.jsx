@@ -36,10 +36,8 @@ const Closed = () => {
       .then((response) => {
         const responseData = decryptData(response.data.data);
 
-        // Sort the data by createdAt in descending order
         const sortedData = responseData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-        // Apply date range filter
         const filteredByDate = sortedData.filter((report) => {
           const reportDate = new Date(report.createdAt);
           if (fromDate && reportDate < new Date(fromDate)) return false;
@@ -47,14 +45,13 @@ const Closed = () => {
           return true;
         });
 
-        // Apply search filter
         const filteredCenters = filteredByDate.filter((report) =>
           Object.values(report).some((value) =>
             value.toString().toLowerCase().includes(searchValue.toLowerCase())
           )
         );
 
-        setReport(filteredByDate); // Update report with date-filtered data
+        setReport(filteredByDate);
         setTotalPages(Math.ceil(filteredCenters.length / itemsPerPage));
         const lastIndex = currentPage * itemsPerPage;
         const firstIndex = lastIndex - itemsPerPage;
