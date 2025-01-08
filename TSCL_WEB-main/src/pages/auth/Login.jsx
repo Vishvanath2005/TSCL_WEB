@@ -53,7 +53,6 @@ const Login = ({ setToken }) => {
         sessionStorage.setItem("code",decodedToken.code)
       }
     } catch (error) {
-      // console.error("Error logging in as user", error);
     }
     if ( isRegularUserLoggedIn === true) {
       const tokenExpirationDuration = getTokenExpirationDuration(token);
@@ -99,7 +98,7 @@ const Login = ({ setToken }) => {
       
       <div className="flex items-center justify-center gap-3 ">
         <img src={logo} alt="Image" className="w-24 h-24" />
-        <p className="text-6xl text-secondary">TSCL</p>
+        <p className="text-6xl text-secondary">MSCL</p>
       </div>
       <div className="mx-3  ">
         <div className="p-6  md:max-w-[600px] w-full  md:bg-white  rounded-lg ">
@@ -107,7 +106,6 @@ const Login = ({ setToken }) => {
 
             <form onSubmit={handleSubmit(onSubmit)}>
               <p className="text-xl md:text-black text-gray-200  md:mx-2  my-2 ">Sign In</p>
-
               <div className=" grid md:grid-cols-3 grid-col-2  font-normal md:mx-4 py-3">
                 <label
                   className="flex md:text-black text-slate-800 text-lg font-medium mb-2 col-span-1 "
