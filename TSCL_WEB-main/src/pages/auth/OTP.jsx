@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate,useLocation } from "react-router-dom";
-import logo from "../../assets/images/logo1.png"
+import { useNavigate, useLocation } from "react-router-dom";
+import logo from "../../assets/images/logo1.png";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { API } from "../../Host";
@@ -9,7 +9,7 @@ import { AiOutlineLoading } from "react-icons/ai";
 
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 
-const OTP = ({setIsLoggedIn}) => {
+const OTP = () => {
   const navigate = useNavigate();
   const [processing, setProcessing] = useState(false);
   const [formData, setFormData] = useState({
@@ -22,6 +22,8 @@ const OTP = ({setIsLoggedIn}) => {
   });
 
   const location = useLocation();
+  const dataTosend = location?.state;
+
   const [timer, setTimer] = useState(90);
   const [canResend, setCanResend] = useState(false);
   const handleChange = (value, event) => {
@@ -36,12 +38,12 @@ const OTP = ({setIsLoggedIn}) => {
       }
     } else {
       const next = elmnt.target.tabIndex;
-      if (next < 4) {
+      if (next < 6) {
         elmnt.target.form.elements[next].focus();
       }
     }
   };
-  
+
   const setUpRecaptcha = () => {
     window.recaptchaVerifier = new RecaptchaVerifier(
       auth,
@@ -125,11 +127,19 @@ const OTP = ({setIsLoggedIn}) => {
         return;
       }
       await confirmationResult.confirm(otp);
+
       localStorage.setItem("isLoggedIn", true);
-      setIsLoggedIn(true);
-      navigate("/dashboard");
-      toast.success("OTP Verified & LoggedIn.");
-      setProcessing(false);
+
+      const response = await axios.post(`${API}/public-user/post`, dataTosend);
+
+      if (response.status === 200) {
+        toast.success("Account Created Successfully");
+        navigate("/");
+      } else {
+        toast.error("Failed To Upload");
+        setProcessing(false);
+        console.log("Error in posting Data");
+      }
     } catch (err) {
       console.error("Error verifying OTP:", err);
       toast.error("Invalid OTP. Please try again.");
@@ -139,7 +149,6 @@ const OTP = ({setIsLoggedIn}) => {
     }
   };
 
-
   return (
     <div className="h-screen  bg-primary py-6 flex flex-col items-center gap-8 justify-center ">
       <div className="flex items-center gap-4">
@@ -148,63 +157,65 @@ const OTP = ({setIsLoggedIn}) => {
       </div>
       <div className="p-6 md:w-[550px]   md:bg-white  rounded-lg mx-5">
         <div className="font-lexend text-start mt-2">
-          <p className="text-xl py-2 md:text-black text-gray-200 text-center">One Time Password</p>
+          <p className="text-xl py-2 md:text-black text-gray-200 text-center">
+            One Time Password
+          </p>
           <form className="z-0" onSubmit={onOTPVerify}>
-          <p className="text-center text-lg my-4 font-extralight">
-            Phone Number Verification
-          </p>
-          <div className="flex justify-center gap-3 my-6">
-            {Object.keys(formData).map((key, index) => (
-              <input
-                key={key}
-                name={key}
-                type="text"
-                autoComplete="off"
-                className="w-12 h-14 text-center border-2 bg-transparent outline-none"
-                value={formData[key]}
-                onChange={(e) => handleChange(key, e)}
-                tabIndex={index + 1}
-                maxLength="1"
-                onKeyUp={(e) => inputfocus(e)}
-              />
-            ))}
-          </div>
-          <p className="text-center font-extralight mx-2 my-3">
-            We have sent you an OTP (one-time password) to your phone number
-          </p>
-          <div className="flex justify-around my-12">
-            <p
-              className={`text-lg font-extralight ${
-                canResend ? "cursor-pointer" : "text-gray-400"
-              }`}
-              onClick={() => canResend && handleResendOtp()}
-            >
-              Resend OTP
+            <p className="text-center text-lg my-4 font-extralight">
+              Phone Number Verification
             </p>
-            <p className="text-lg font-extralight ">{formatTime(timer)}</p>
-          </div>
-          <div className="flex justify-center my-12">
-            <button
-              className="text-lg bg-primary rounded-md text-white w-1/2 py-2.5"
-              type="submit"
-            >
-              {processing ? (
-                <span className="flex justify-center gap-3">
-                  {" "}
-                  <AiOutlineLoading className="h-6 w-6 animate-spin" />{" "}
-                  <p>Verifying....</p>
-                </span>
-              ) : (
-                "Verify"
-              )}
-            </button>
-          </div>
-          {/* <p className="text-sm mt-3 text-center font-extralight">
+            <div className="flex justify-center gap-3 my-6">
+              {Object.keys(formData).map((key, index) => (
+                <input
+                  key={key}
+                  name={key}
+                  type="text"
+                  autoComplete="off"
+                  className="w-12 h-14 text-center border-2 bg-transparent outline-none"
+                  value={formData[key]}
+                  onChange={(e) => handleChange(key, e)}
+                  tabIndex={index + 1}
+                  maxLength="1"
+                  onKeyUp={(e) => inputfocus(e)}
+                />
+              ))}
+            </div>
+            <p className="text-center font-extralight mx-2 my-3">
+              We have sent you an OTP (one-time password) to your phone number
+            </p>
+            <div className="flex justify-around my-12">
+              <p
+                className={`text-lg font-extralight ${
+                  canResend ? "cursor-pointer" : "text-gray-400"
+                }`}
+                onClick={() => canResend && handleResendOtp()}
+              >
+                Resend OTP
+              </p>
+              <p className="text-lg font-extralight ">{formatTime(timer)}</p>
+            </div>
+            <div className="flex justify-center my-12">
+              <button
+                className="text-lg bg-primary rounded-md text-white w-1/2 py-2.5"
+                type="submit"
+              >
+                {processing ? (
+                  <span className="flex justify-center gap-3">
+                    {" "}
+                    <AiOutlineLoading className="h-6 w-6 animate-spin" />{" "}
+                    <p>Verifying....</p>
+                  </span>
+                ) : (
+                  "Verify"
+                )}
+              </button>
+            </div>
+            {/* <p className="text-sm mt-3 text-center font-extralight">
             &#169; PickMyCourse Developed with{" "}
             <span className="text-red-700">&#x2764;</span> by SeenIT Pty Ltd
           </p> */}
-        </form>
-        <div id="recaptcha-container"></div>
+          </form>
+          <div id="recaptcha-container"></div>
         </div>
       </div>
     </div>
