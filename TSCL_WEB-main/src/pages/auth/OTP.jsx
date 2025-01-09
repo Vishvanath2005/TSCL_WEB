@@ -75,7 +75,6 @@ const OTP = () => {
       setUpRecaptcha();
       const appVerifier = window.recaptchaVerifier;
       const formattedPhone = `+${countryCode}${phone}`;
-
       const confirmationResult = await signInWithPhoneNumber(
         auth,
         formattedPhone,

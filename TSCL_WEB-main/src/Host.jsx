@@ -1,4 +1,4 @@
-export const API = "http://api.maduraismartcity.com/"
+export const API = "https://api.maduraismartcity.com/"
 
 export function formatDate(dateString) {
     const date = new Date(dateString);
