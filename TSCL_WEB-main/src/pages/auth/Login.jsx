@@ -97,9 +97,9 @@ const Login = ({ setToken }) => {
   return (
     <div className="h-screen  bg-primary py-6 flex flex-col md:items-center gap-8 justify-center ">
       
-      <div className="flex items-center justify-center gap-3 ">
+      <div className="flex flex-col items-center justify-center gap-3 ">
         <img src={logo} alt="Image" className="w-24 h-24" />
-        <p className="text-6xl text-secondary">MSCL</p>
+        <p className="text-4xl text-secondary font-semibold drop-shadow-2xl ">Madurai Smart City </p>
       </div>
       <div className="mx-3  ">
         <div className="p-6  md:max-w-[600px] w-full  md:bg-white  rounded-lg ">

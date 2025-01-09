@@ -127,10 +127,10 @@ const SignUp = () => {
 
   return (
     <div className="h-screen bg-primary py-6 flex flex-col md:items-center gap-8 justify-center">
-      <div className="flex items-center justify-center gap-3">
-        <img src={logo} alt="Image" className="w-24 h-24" />
-        <p className="text-6xl text-secondary">MSCL</p>
-      </div>
+        <div className="flex flex-col items-center justify-center gap-3 ">
+              <img src={logo} alt="Image" className="w-24 h-24" />
+              <p className="text-4xl text-secondary font-semibold drop-shadow-2xl ">Madurai Smart City </p>
+            </div>
       <div className="mx-3">
         <div className="p-6 md:max-w-[600px] w-full md:bg-white relative rounded-lg">
           <div className="font-lexend text-start mt-2">
@@ -151,7 +151,7 @@ const SignUp = () => {
                   type="text"
                   id="public_user_name"
                   name="public_user_name"
-                  className="md:col-span-2 col-span-1 border outline-none rounded-lg px-5 py-1.5 bg-gray-200 md:bg-gray-50"
+                  className="md:col-span-2 col-span-1 border outline-none rounded-lg px-5 py-1.5 bg-white md:bg-white"
                   placeholder="Enter your Name"
                   onChange={handleInputChange}
                 />
@@ -169,7 +169,7 @@ const SignUp = () => {
                   type="email"
                   id="email"
                   name="email"
-                  className="md:col-span-2 col-span-1 border outline-none rounded-lg py-1.5 px-5 bg-gray-200 md:bg-gray-50"
+                  className="md:col-span-2 col-span-1 border outline-none rounded-lg py-1.5 px-5 bg-white md:bg-white"
                   placeholder="tscl123@gmail.com"
                   onChange={handleInputChange}
                 />
@@ -182,7 +182,7 @@ const SignUp = () => {
                 <PhoneInput
                   value={phone}
                   onChange={handlePhoneChange}
-                  className="w-[348px] py-1 border text-black font-poppins font-extralight rounded-md shadow-md outline-none bg-white"
+                  className="w-[348px] py-1 border text-black font-poppins font-extralight rounded-md  outline-none "
                   inputStyle={{
                     border: "none",
                     textAlign: "center",
