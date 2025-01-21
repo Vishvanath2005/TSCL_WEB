@@ -121,7 +121,7 @@ const onSubmit = async (data) => {
     if (response.status === 200) {
       toast.success("Profile Updated Successfully");
       setIsPassword(null);
-      navigate("/dashboard");
+      navigate("/report");
     } else {
       console.error("Error in posting data", response);
       toast.error("Failed to Upload");

@@ -1,4 +1,4 @@
-export const API = "https://api.maduraismartcity.com/"
+export const API = "http://localhost:4000"
 
 export function formatDate(dateString) {
     const date = new Date(dateString);
@@ -24,7 +24,6 @@ export function formatDate(dateString) {
         hour12: true 
     };
 
-    // Convert the date to the desired format
     const formattedDate = date.toLocaleDateString('en-GB', options);
     const [datePart, timePart] = formattedDate.split(', ');
 

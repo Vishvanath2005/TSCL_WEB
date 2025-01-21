@@ -8,6 +8,7 @@ import { API } from "../../Host";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { jwtDecode } from "jwt-decode";
+import { IoMdArrowRoundBack } from "react-icons/io";
 
 const UserSchema = yup.object().shape({
   identifier: yup.string().required("User Name is required"),
@@ -92,6 +93,10 @@ const Login = ({ setToken }) => {
     navigate("/guest")
   }
 
+  const home =()=>{
+    navigate("/")
+  }
+
 
 
   return (
@@ -172,6 +177,9 @@ const Login = ({ setToken }) => {
             </p>
            
           </div>
+        </div>
+        <div className="text-center py-4 flex justify-center">
+         <button onClick={home} className="bg-blue-600 rounded-full text-white drop-shadow-2xl text-xl border-white border px-4 py-2.5 flex gap-3 items-center "> <IoMdArrowRoundBack />Back to Home Page</button>
         </div>
       </div>
     </div>

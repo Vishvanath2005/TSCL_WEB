@@ -29,6 +29,8 @@ const OTP = () => {
   const handleChange = (value, event) => {
     setFormData({ ...formData, [value]: event.target.value });
   };
+  console.log(formData);
+  
 
   const inputfocus = (elmnt) => {
     if (elmnt.key === "Delete" || elmnt.key === "Backspace") {
@@ -133,6 +135,11 @@ const OTP = () => {
 
       if (response.status === 200) {
         toast.success("Account Created Successfully");
+        const DataForm = { ...location.state?.DataForm };
+        DataForm.verification_status = "verified";
+        DataForm.user_status = "active";
+        console.log(formData);
+        
         navigate("/");
       } else {
         toast.error("Failed To Upload");
