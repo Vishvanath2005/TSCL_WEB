@@ -9,11 +9,11 @@ import ContactUs from "./ContactUs";
 import Terms from "./Terms";
 import PrivacyPolicy from "./PrivacyPolicy";
 import AboutUs from "./AboutUs";
-import { Link, useNavigate}  from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 const LandingPage = () => {
   const [language, setLanguage] = useState("en");
   const [activeLink, setActiveLink] = useState("");
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const translations = {
     en: {
@@ -108,9 +108,9 @@ const LandingPage = () => {
     setActiveLink(link);
   };
 
-  const login =()=>{
-    navigate("/login")
-  }
+  const login = () => {
+    navigate("/login");
+  };
 
   return (
     <>
@@ -172,116 +172,124 @@ const LandingPage = () => {
             <section className="relative   ">
               <div>
                 <img src={MsclMain} alt="Madurai city" className="rounded-md" />
-                <div className="absolute -bottom-32 left-1/2 transform -translate-x-1/2 grid grid-cols-3 gap-6 bg-white p-6 w-4/5 rounded-xl shadow-md" onClick={login}>
-                  <button className="px-8 py-8 flex flex-col items-center justify-center gap-2 bg-[#E6D590] rounded-lg">
+                <div className="absolute -bottom-32 left-1/2 transform -translate-x-1/2 grid grid-cols-3 gap-6 bg-white p-6 w-4/5 rounded-xl shadow-md">
+                  <button
+                    onClick={login}
+                    className="px-8 py-8 flex flex-col items-center justify-center gap-2 bg-[#E6D590] rounded-lg"
+                  >
                     <div className="bg-[#21409A] rounded-full px-4 py-4 ">
                       <TbBulb className="size-6 text-[#E6D590]" />
                     </div>
                     <p>{translations[language].grievance}</p>
                   </button>
-                  <button className="px-8 py-8 flex flex-col items-center justify-center gap-2 bg-[#E6D590] rounded-lg">
+                  <button
+                    onClick={login}
+                    className="px-8 py-8 flex flex-col items-center justify-center gap-2 bg-[#E6D590] rounded-lg"
+                  >
                     <div className="bg-[#21409A] rounded-full px-4 py-4 ">
                       <GrLogin className="size-6 text-[#E6D590] " />
                     </div>
                     <p>{translations[language].fileGrievance}</p>
                   </button>
-                  <button className="px-8 py-8 flex flex-col items-center justify-center gap-2 bg-[#E6D590] rounded-lg">
-                    <div className="bg-[#21409A] rounded-full px-4 py-4 ">
-                      <FiFile className="size-6 text-[#E6D590]" />
-                    </div>
-                    <p>{translations[language].officerLogin}</p>
-                  </button>
+                  <a
+                    href="https://portal.maduraismartcity.com/"
+                    className="px-8 py-8 flex flex-col items-center justify-center gap-2 bg-[#E6D590] rounded-lg"
+                  >
+                    <button>
+                      <div className="bg-[#21409A] items-center rounded-full px-4 mx-5 my-2 w-fit py-4 ">
+                        <FiFile className="size-6 text-[#E6D590]" />
+                      </div>
+                      <p>{translations[language].officerLogin}</p>
+                    </button>
+                  </a>
                 </div>
               </div>
             </section>
 
             <section className="text-center">
-  <h2 className="font-bold text-2xl mb-8">
-    {translations[language].stepsTitle}
-  </h2>
-  <div className="grid grid-cols-5 items-center gap-4 w-4/5 mx-auto ">
-    {/* Step 1 */}
-    <div className="col-span-2 flex justify-center items-center p-6 bg-[#FFF5CE] rounded-lg">
-      <div className="bg-white shadow-md px-8 py-10 text-center w-full space-y-2">
-        <h3 className="font-bold text-xl text-[#21409A]">
-          {translations[language].step1.title}
-        </h3>
-        <h1 className="font-semibold text-lg">
-          {translations[language].step1.heading}
-        </h1>
-        <p className="text-[#575757] font-normal text-sm">
-          {translations[language].step1.description}
-        </p>
-      </div>
-    </div>
+              <h2 className="font-bold text-2xl mb-8">
+                {translations[language].stepsTitle}
+              </h2>
+              <div className="grid grid-cols-5 items-center gap-4 w-4/5 mx-auto ">
+                {/* Step 1 */}
+                <div className="col-span-2 flex justify-center items-center p-6 bg-[#FFF5CE] rounded-lg">
+                  <div className="bg-white shadow-md px-8 py-10 text-center w-full space-y-2">
+                    <h3 className="font-bold text-xl text-[#21409A]">
+                      {translations[language].step1.title}
+                    </h3>
+                    <h1 className="font-semibold text-lg">
+                      {translations[language].step1.heading}
+                    </h1>
+                    <p className="text-[#575757] font-normal text-sm">
+                      {translations[language].step1.description}
+                    </p>
+                  </div>
+                </div>
 
-    {/* Arrow */}
-    <div className="flex items-center ">
-      <div className="border-t-2 border-dashed border-gray-600 flex-grow ml-6"></div>
-      <div className="border-t-[8px] border-b-[8px] border-l-[12px] border-transparent border-l-gray-600"></div>
-    </div>
+                {/* Arrow */}
+                <div className="flex items-center ">
+                  <div className="border-t-2 border-dashed border-gray-600 flex-grow ml-6"></div>
+                  <div className="border-t-[8px] border-b-[8px] border-l-[12px] border-transparent border-l-gray-600"></div>
+                </div>
 
-    {/* Step 2 */}
-    <div className="col-span-2 flex justify-center items-center p-6 bg-[#FFF5CE] rounded-lg">
-      <div className="bg-white shadow-md px-8 py-10 text-center w-full space-y-2">
-        <h3 className="font-bold text-xl text-[#21409A]">
-          {translations[language].step2.title}
-        </h3>
-        <h1 className="font-semibold text-lg">
-          {translations[language].step2.heading}
-        </h1>
-        <p className="text-[#575757] font-normal text-sm">
-          {translations[language].step2.description}
-        </p>
-      </div>
-    </div>
+                {/* Step 2 */}
+                <div className="col-span-2 flex justify-center items-center p-6 bg-[#FFF5CE] rounded-lg">
+                  <div className="bg-white shadow-md px-8 py-10 text-center w-full space-y-2">
+                    <h3 className="font-bold text-xl text-[#21409A]">
+                      {translations[language].step2.title}
+                    </h3>
+                    <h1 className="font-semibold text-lg">
+                      {translations[language].step2.heading}
+                    </h1>
+                    <p className="text-[#575757] font-normal text-sm">
+                      {translations[language].step2.description}
+                    </p>
+                  </div>
+                </div>
 
-    {/* Dotted Downward Arrow */}
-    <div className="col-span-6  flex flex-col px-52 items-end">
-      <div className="h-16 border-l-2 border-dashed border-gray-600 px-[2.4px]"></div>
-      <div className="w-0 h-0 border-t-[12px] border-l-[6px] border-r-[6px] border-t-gray-600 border-l-transparent border-r-transparent mt-[-1px]"></div>
-    </div>
+                {/* Dotted Downward Arrow */}
+                <div className="col-span-6  flex flex-col px-52 items-end">
+                  <div className="h-16 border-l-2 border-dashed border-gray-600 px-[2.4px]"></div>
+                  <div className="w-0 h-0 border-t-[12px] border-l-[6px] border-r-[6px] border-t-gray-600 border-l-transparent border-r-transparent mt-[-1px]"></div>
+                </div>
 
-     {/* Step 4 */}
-     <div className="col-span-2 flex justify-center items-center p-6 bg-[#FFF5CE] rounded-lg">
-      <div className="bg-white shadow-md px-8 py-10 text-center w-full space-y-2">
-        <h3 className="font-bold text-xl text-[#21409A]">
-          {translations[language].step4.title}
-        </h3>
-        <h1 className="font-semibold text-lg">
-          {translations[language].step4.heading}
-        </h1>
-        <p className="text-[#575757] font-normal text-sm">
-          {translations[language].step4.description}
-        </p>
-      </div>
-    </div>
+                {/* Step 4 */}
+                <div className="col-span-2 flex justify-center items-center p-6 bg-[#FFF5CE] rounded-lg">
+                  <div className="bg-white shadow-md px-8 py-10 text-center w-full space-y-2">
+                    <h3 className="font-bold text-xl text-[#21409A]">
+                      {translations[language].step4.title}
+                    </h3>
+                    <h1 className="font-semibold text-lg">
+                      {translations[language].step4.heading}
+                    </h1>
+                    <p className="text-[#575757] font-normal text-sm">
+                      {translations[language].step4.description}
+                    </p>
+                  </div>
+                </div>
 
-    {/* Reverse Arrow */}
-    <div className="flex items-center rotate-180 ml-6 ">
-      <div className="border-t-2 border-dashed border-gray-600 flex-grow "></div>
-      <div className="border-t-[8px] border-b-[8px] border-l-[12px] border-transparent border-l-gray-600 "></div>
-    </div>
+                {/* Reverse Arrow */}
+                <div className="flex items-center rotate-180 ml-6 ">
+                  <div className="border-t-2 border-dashed border-gray-600 flex-grow "></div>
+                  <div className="border-t-[8px] border-b-[8px] border-l-[12px] border-transparent border-l-gray-600 "></div>
+                </div>
 
-     {/* Step 3 */}
-     <div className="col-span-2 flex justify-center items-center px-6 py-3 bg-[#FFF5CE] rounded-lg">
-      <div className="bg-white shadow-md px-8 py-10 text-center w-full space-y-2">
-        <h3 className="font-bold text-xl text-[#21409A]">
-          {translations[language].step3.title}
-        </h3>
-        <h1 className="font-semibold text-lg">
-          {translations[language].step3.heading}
-        </h1>
-        <p className="text-[#575757] font-normal text-sm">
-          {translations[language].step3.description}
-        </p>
-      </div>
-    </div>
-
-  
-  </div>
-</section>
-
+                {/* Step 3 */}
+                <div className="col-span-2 flex justify-center items-center px-6 py-3 bg-[#FFF5CE] rounded-lg">
+                  <div className="bg-white shadow-md px-8 py-10 text-center w-full space-y-2">
+                    <h3 className="font-bold text-xl text-[#21409A]">
+                      {translations[language].step3.title}
+                    </h3>
+                    <h1 className="font-semibold text-lg">
+                      {translations[language].step3.heading}
+                    </h1>
+                    <p className="text-[#575757] font-normal text-sm">
+                      {translations[language].step3.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </section>
           </main>
         )}
 

@@ -29,7 +29,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/auth" element={<OTP />} />
           <Route path="/signup" element={<SignUp />} />
-          <Route path="/" element={<LandingPage/>}/>
+          <Route path="" element={<LandingPage/>}/>
           <Route path="/" element={<Layout />}>
             <Route path="/closed" element={<Closed />} />
             <Route path="/form" element={<GrievancesForm />} />
