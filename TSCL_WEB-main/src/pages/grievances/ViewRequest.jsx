@@ -209,20 +209,27 @@ const ViewRequest = () => {
         <div className="md:mx-6 mx-2  my-5 font-lexend">
          <div className="flex justify-between items-center">
          <p>Complaint Details #{data.grievance_id}</p>
-         {data.status === "closed" && (() => {
-                const createdAt = new Date(data.createdAt);
+         {data.status === "closed" &&
+              (() => {
+                const updatedAt = new Date(data.ticketclosedtime);
+
                 const today = new Date();
-                const timeDifference = today - createdAt; 
+
+                const timeDifference = today - updatedAt;
+
                 const daysDifference = timeDifference / (1000 * 60 * 60 * 24);
 
                 return daysDifference <= 7 ? (
-                  <button className="bg-green-600 px-3 py-1.5 rounded-md shadow-md text-white text-sm"
-                  onClick={() => {
-                    const userConfirmed = window.confirm("Are you sure you want to Re-open the ticket?");
-                    if (userConfirmed) {
-                      handleReOpen();
-                    }
-                  }}
+                  <button
+                    className="bg-green-600 px-3 py-1.5 rounded-md shadow-md text-white text-sm"
+                    onClick={() => {
+                      const userConfirmed = window.confirm(
+                        "Are you sure you want to Re-open the ticket?"
+                      );
+                      if (userConfirmed) {
+                        handleReOpen();
+                      }
+                    }}
                   >
                     Re-open Ticket
                   </button>
