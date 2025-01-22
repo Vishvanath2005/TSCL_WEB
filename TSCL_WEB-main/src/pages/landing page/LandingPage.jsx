@@ -328,9 +328,9 @@ const LandingPage = () => {
                   info@maduraismartcity.com
                 </a>
               </p>
-              <p>
-                Address: 1255, MADURAI CORPORATION BUILDING, MELUR ROAD,
-                TALLAKULAM, Madurai, Tamil Nadu, 625020
+              <p className="flex flex-col">
+                <span>Address: 1255, Madurai Corporation Building,</span>
+                <span> Melur Road, Tallakulam, Madurai, Tamil Nadu, 625020.</span>
               </p>
             </div>
             <nav className="items-end col-span-1 flex flex-col justify-end text-end font-normal text-sm text-[#D9D9D9] py-4">

@@ -140,8 +140,11 @@ const Terms = () => {
             <strong>Phone:</strong> <p>9585912344</p>
           </li>
           <li>
-            <strong>Address:</strong> <p>1255, MADURAI CORPORATION BUILDING, MELUR ROAD,
-            TALLAKULAM, Madurai, Tamil Nadu, 625020</p>
+            <strong>Address:</strong>
+            <p>
+              1255, Madurai Corporation Building, Melur Road, Tallakulam,
+              Madurai, Tamil Nadu, 625020.
+            </p>
           </li>
         </ul>
       </div>
