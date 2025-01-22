@@ -355,7 +355,7 @@ const LandingPage = () => {
             </nav>
           </div>
           <hr className="border-[#8C8C8C] border-0.5 mr-2" />
-          <p className="text-[#8B8B8B] py-3 text-center text-sm font-normal">
+          <p className="text-white py-3 text-center text-sm font-normal">
             {translations[language].rightsReserved}
           </p>
         </div>
