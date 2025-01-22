@@ -134,13 +134,14 @@ const Terms = () => {
         </p>
         <ul className="list-none pl-0">
           <li>
-            <strong>Email:</strong> [Insert Email Address]
+            <strong>Email:</strong> <p>info@maduraismartcity.com</p>
           </li>
           <li>
-            <strong>Phone:</strong> [Insert Phone Number]
+            <strong>Phone:</strong> <p>9585912344</p>
           </li>
           <li>
-            <strong>Address:</strong> [Insert Address]
+            <strong>Address:</strong> <p>1255, MADURAI CORPORATION BUILDING, MELUR ROAD,
+            TALLAKULAM, Madurai, Tamil Nadu, 625020</p>
           </li>
         </ul>
       </div>

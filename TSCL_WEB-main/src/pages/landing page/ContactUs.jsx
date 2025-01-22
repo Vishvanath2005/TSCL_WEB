@@ -27,6 +27,8 @@ const ContactUs = ({ language }) => {
         <img src={MsclMain1} alt="Madurai Image"/>
       </div>
       <div className="w-1/2 mx-6">
+      <p className="text-center font-semibold text-blue-600 text-xl">Contact Us</p>
+      <p className=" my-3 font-semibold">Enquries Form</p>
         <form className="grid gap-5">
           <input
             type="text"

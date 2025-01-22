@@ -174,7 +174,7 @@ const Dashboard = () => {
           <h1 className="md:text-xl text-lg font-bold">Dashboard</h1>
         </div>
         <div className="grid grid-cols-3 gap-4 px-4 my-3">
-          <div className="col-span-1 py-3 rounded-md bg-white">
+          <div className="col-span-3 sm:col-span-1 py-3 rounded-md bg-white">
             <div className=" space-y-3 px-10">
               <p className="text-xl font-semibold ">Total Complaints </p>
               <p className="flex justify-between gap-2 items-center">
@@ -183,7 +183,7 @@ const Dashboard = () => {
               </p>
             </div>
           </div>
-          <div className="col-span-1 py-3 rounded-md bg-white">
+          <div className="col-span-3 sm:col-span-1 py-3 rounded-md bg-white">
             {" "}
             <div className="space-y-3 px-10">
               <p className="text-xl font-semibold"> Resolved Complaints</p>
@@ -193,7 +193,7 @@ const Dashboard = () => {
               </p>
             </div>
           </div>
-          <div className="col-span-1 py-3 rounded-md bg-white">
+          <div className="col-span-3 sm:col-span-1 py-3 rounded-md bg-white">
             {" "}
             <div className="space-y-3 px-10">
               <p className="text-xl font-semibold "> Pending Complaints</p>

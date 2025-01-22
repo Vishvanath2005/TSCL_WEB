@@ -248,7 +248,7 @@ const LandingPage = () => {
                 </div>
 
                 {/* Dotted Downward Arrow */}
-                <div className="col-span-6  flex flex-col px-56 items-end">
+                <div className="col-span-6  flex flex-col px-52 items-end">
                   <div className="h-16 border-l-2 border-dashed border-gray-600 px-[2.4px]"></div>
                   <div className="w-0 h-0 border-t-[12px] border-l-[6px] border-r-[6px] border-t-gray-600 border-l-transparent border-r-transparent mt-[-1px]"></div>
                 </div>
@@ -317,38 +317,45 @@ const LandingPage = () => {
         )}
       </div>
       <footer className="mt-12   text-white bg-[#21409A] font-roboto ">
-        <div className="mx-8 py-6 space-y-4">
-          <p className="font-medium text-xl">
-            {translations[language].quickLinks}
-          </p>
-          <nav className="flex justify-between font-normal text-sm text-[#D9D9D9] py-4">
-            <button
-              onClick={() => handleLinkClick("/terms")}
-              className="text-left hover:underline"
-            >
-              {translations[language]?.terms || "Terms and Conditions"}
-            </button>
-            <button
-              onClick={() => handleLinkClick("/privacy")}
-              className="text-left hover:underline"
-            >
-              {translations[language].privacy}
-            </button>
-            <button
-              onClick={() => handleLinkClick("/contactus")}
-              className="text-left hover:underline"
-            >
-              {translations[language].contactUs}
-            </button>
-            <button
-              onClick={() => handleLinkClick("/aboutus")}
-              className="text-left hover:underline"
-            >
-              {translations[language].aboutUs}
-            </button>
-          </nav>
-          <hr className="border-[#8C8C8C] border-0.5 mr-20" />
-          <p className="text-[#8B8B8B] py-3 text-sm font-normal">
+        <div className=" py-6 mx-3  space-y-4">
+         
+          <div className=" grid grid-cols-2  mx-8 ">
+            <div className="col-span-1">
+              <p>Phone: 9585912344</p>
+              <p>
+                E-Mail:{" "}
+                <a href="info@maduraismartcity.com">
+                  info@maduraismartcity.com
+                </a>
+              </p>
+              <p>
+                Address: 1255, MADURAI CORPORATION BUILDING, MELUR ROAD,
+                TALLAKULAM, Madurai, Tamil Nadu, 625020
+              </p>
+            </div>
+            <nav className="items-end col-span-1 flex flex-col justify-end text-end font-normal text-sm text-[#D9D9D9] py-4">
+              <button
+                onClick={() => handleLinkClick("/terms")}
+                className="text-left hover:underline"
+              >
+                {translations[language]?.terms || "Terms and Conditions"}
+              </button>
+              <button
+                onClick={() => handleLinkClick("/privacy")}
+                className="text-left hover:underline"
+              >
+                {translations[language].privacy}
+              </button>
+              <button
+                onClick={() => handleLinkClick("/contactus")}
+                className="text-left hover:underline"
+              >
+                {translations[language].contactUs}
+              </button>
+            </nav>
+          </div>
+          <hr className="border-[#8C8C8C] border-0.5 mr-2" />
+          <p className="text-[#8B8B8B] py-3 text-center text-sm font-normal">
             {translations[language].rightsReserved}
           </p>
         </div>
