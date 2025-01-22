@@ -60,7 +60,7 @@ const Login = ({ setToken }) => {
       const tokenExpirationDuration = getTokenExpirationDuration(token);
       sessionStorage.setItem('token', token);
       toast.success("Logged in successfully");
-      navigate("/report");
+      navigate("/dashboard");
       const timeoutId = setTimeout(() => {
         navigate("/token");
       }, tokenExpirationDuration * 1000);

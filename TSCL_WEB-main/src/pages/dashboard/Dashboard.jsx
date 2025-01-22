@@ -10,8 +10,11 @@ import { useSelector } from "react-redux";
 import logo from "../../assets/images/logo1.png";
 import { addDays } from "date-fns";
 import { toast } from "react-toastify";
+import { GrCompliance } from "react-icons/gr";
+import { TbReport } from "react-icons/tb";
+import { MdPendingActions } from "react-icons/md";
 
-const Report = () => {
+const Dashboard = () => {
   const [searchValue, setSearchValue] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -27,6 +30,9 @@ const Report = () => {
   const [toDate, setToDate] = useState("");
   const [grievanceImages, setGrievanceImages] = useState({});
   const [filteredGrievances, setFilteredGrievances] = useState([]);
+  const [totalReports, setTotalReports] = useState(0);
+  const [closedReports, setClosedReports] = useState(0);
+  const [pendingReports, setPendingReports] = useState(0);
 
   const token = sessionStorage.getItem("token");
   const code = sessionStorage.getItem("code");
@@ -56,7 +62,22 @@ const Report = () => {
       const responseData = decryptData(response.data.data);
       setReport(responseData);
 
-      // Filter reports based on search, selected status, and date range
+      const totalReports = responseData.length;
+      const closedReports = responseData.filter(
+        (report) => report.status === "closed"
+      ).length;
+      const pendingReports = responseData.filter(
+        (report) => report.status != "closed"
+      ).length;
+
+      console.log("Total Reports:", totalReports);
+      console.log("Closed Reports:", closedReports);
+      console.log("Pending Reports:", pendingReports);
+
+      setTotalReports(totalReports);
+      setClosedReports(closedReports);
+      setPendingReports(pendingReports);
+
       const filteredReports = responseData.filter((report) => {
         const statusMatch =
           selectedStatus === "All" || report.status === selectedStatus;
@@ -150,69 +171,42 @@ const Report = () => {
     <div className="overflow-y-auto  no-scrollbar">
       <div className="font-lexend h-screen ">
         <div className="flex justify-between items-center my-2 mx-8 gap-1 flex-wrap">
-          <h1 className="md:text-xl text-lg font-bold">My Report</h1>
-
-          <button
-            className="flex  flex-row-2 gap-2 font-medium font-lexend items-center border-2 bg-blue-500 text-white rounded-full py-2 px-3 justify-between md:text-base text-sm"
-            onClick={() =>
-              navigate(`/form`, {
-                state: { grievanceId: report.grievance_id },
-              })
-            }
-          >
-            <FaPlus /> Add Report
-          </button>
+          <h1 className="md:text-xl text-lg font-bold">Dashboard</h1>
         </div>
-
-        <div className="bg-white h-4/5 mx-3 rounded-lg p-3">
-          <div className="flex justify-between items-center gap-6 mt-2 mx-3">
-            <div className="flex items-center gap-3 mx-3">
-              <div className=" flex items-center gap-10">
-                <p className="text-lg whitespace-nowrap">View Report</p>
-
-                <div className="flex items-center gap-3  border-2 w-fit py-1.5 rounded-lg border-primary pr-3 mx-3">
-                  <DateRangeComp onChange={handleDateRangeChange} />
-                </div>
-                <div className="border-2 border-blue-700 px-2 py-1 flex gap-3 rounded-lg">
-                  <label
-                    htmlFor="itemsPerPage"
-                    className="font-medium text-gray-600"
-                  >
-                    Page Entries:
-                  </label>
-
-                  <select
-                    id="itemsPerPage"
-                    value={itemsPerPage}
-                    onChange={handleItemsPerPageChange}
-                    className="p-1 outline-none border bg-blue-500 text-white text-sm rounded-lg px-2"
-                  >
-                    {[5, 10, 20, 50].map((num) => (
-                      <option key={num} value={num}>
-                        {num}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
+        <div className="grid grid-cols-3 gap-4 px-4 my-3">
+          <div className="col-span-1 py-3 rounded-md bg-white">
+            <div className=" space-y-3 px-10">
+              <p className="text-xl font-semibold ">Total Complaints </p>
+              <p className="flex justify-between gap-2 items-center">
+                <span className="text-3xl">{totalReports}</span>{" "}
+                <TbReport className="text-3xl text-green-800" />
+              </p>
             </div>
-            <select
-              className="block items-center w-fit px-1 py-2 text-center text-sm bg-primary text-white border border-none rounded-full hover:border-gray-200 outline-none capitalize"
-              onChange={(e) => handleStatusChange(e.target.value)}
-              value={selectedStatus || ""}
-            >
-              <option hidden>Status</option>
-              <option value="All">All</option>
-              {status.map((option) => (
-                <option key={option.status_name} value={option.status_name}>
-                  {option.status_name}
-                </option>
-              ))}
-            </select>
           </div>
-
+          <div className="col-span-1 py-3 rounded-md bg-white">
+            {" "}
+            <div className="space-y-3 px-10">
+              <p className="text-xl font-semibold"> Resolved Complaints</p>
+              <p className=" flex gap-2 justify-between items-center">
+                <span className="text-3xl">{closedReports} </span>{" "}
+                <GrCompliance className="text-3xl text-yellow-500" />
+              </p>
+            </div>
+          </div>
+          <div className="col-span-1 py-3 rounded-md bg-white">
+            {" "}
+            <div className="space-y-3 px-10">
+              <p className="text-xl font-semibold "> Pending Complaints</p>
+              <p className="flex gap-2 justify-between items-center ">
+                <span className="text-3xl">{pendingReports}</span>{" "}
+                <MdPendingActions className="text-3xl text-red-700" />
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white h-fit mx-3 rounded-lg p-3">
           <div className="rounded-lg w-full overflow-x-auto no-scrollbar flex justify-center">
-            <div className="w-full overflow-y-auto max-h-[540px]">
+            <div className="w-full border rounded-md overflow-y-auto max-h-[540px]">
               <table className="w-full mt-3 ">
                 <thead className="border-b border-gray-300">
                   <tr>
@@ -302,76 +296,9 @@ const Report = () => {
             </div>
           </div>
         </div>
-
-        <div className="mt-4 mb-5 mx-7">
-          <nav className="flex items-center flex-column flex-wrap md:flex-row md:justify-between justify-center">
-            <span className="text-sm font-normal text-gray-700 mb-4 md:mb-0 block w-full md:inline md:w-auto text-center font-alegerya">
-              Showing {currentPage * itemsPerPage - itemsPerPage + 1} to{" "}
-              {Math.min(currentPage * itemsPerPage, report.length)} of{" "}
-              {report.length} entries
-            </span>
-            <ul className="inline-flex -space-x-px rtl:space-x-reverse text-sm h-8 font-alegerya">
-              <li>
-                <button
-                  onClick={() => paginate(1)}
-                  disabled={currentPage === 1}
-                  className="flex items-center justify-center px-3 h-8 leading-tight text-primary bg-paginate-bg border border-paginate-br rounded-s-lg"
-                >
-                  &lt;&lt;
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => paginate(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="flex items-center justify-center px-3 h-8 leading-tight text-primary bg-paginate-bg border border-paginate-br"
-                >
-                  Back
-                </button>
-              </li>
-              {Array.from({ length: totalPages }, (_, i) => i + 1)
-                .slice(
-                  Math.max(0, currentPage - 2),
-                  Math.min(totalPages, currentPage + 1)
-                )
-                .map((number) => (
-                  <li key={number}>
-                    <button
-                      onClick={() => paginate(number)}
-                      className={`flex items-center justify-center px-3 h-8 leading-tight border border-paginate-br ${
-                        currentPage === number
-                          ? "bg-primary text-white"
-                          : "bg-white text-black"
-                      }`}
-                    >
-                      {number}
-                    </button>
-                  </li>
-                ))}
-              <li>
-                <button
-                  onClick={() => paginate(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="flex items-center justify-center px-3 h-8 leading-tight text-primary bg-paginate-bg border border-paginate-br"
-                >
-                  Next
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => paginate(totalPages)}
-                  disabled={currentPage === totalPages}
-                  className="flex items-center justify-center px-3 h-8 leading-tight text-primary bg-paginate-bg border border-paginate-br rounded-e-lg"
-                >
-                  &gt;&gt;
-                </button>
-              </li>
-            </ul>
-          </nav>
-        </div>
       </div>
     </div>
   );
 };
 
-export default Report;
+export default Dashboard;

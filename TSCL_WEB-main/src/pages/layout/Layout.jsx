@@ -1,5 +1,6 @@
 import React, { useState, Suspense } from "react";
 import { Outlet, NavLink, useLocation } from "react-router-dom";
+import { TbLayoutDashboardFilled } from "react-icons/tb";
 import { TiThMenu } from "react-icons/ti";
 import { TiLockClosed } from "react-icons/ti";
 import { TbFileReport } from "react-icons/tb";
@@ -10,26 +11,26 @@ const Layout = () => {
   const location = useLocation();
   const [open, setOpen] = useState(true);
   const [submenuopen, Setsubmenuopen] = useState(false);
- 
+
   const Menus = [
-   
+    { title: "Dashboard", icon: <TbLayoutDashboardFilled />, to: "/dashboard" },
     { title: "My Report", icon: <TbFileReport />, to: "/report" },
     { title: "Closed", icon: <TiLockClosed />, to: "/closed" },
-   
   ];
-  
-
 
   return (
     <div className="w-full h-screen relative  md:flex">
-    
       <div
         className={` md:relative md:grid md:grid-rows-12 absolute   transition-all duration-100 ${
-          open ? "md:w-1/6 w-3/6 h-screen bg-primary" : "md:w-1/12 md:bg-primary"
+          open
+            ? "md:w-1/6 w-3/6 h-screen bg-primary"
+            : "md:w-1/12 md:bg-primary"
         }`}
       >
         <TiThMenu
-          className={`absolute top-4 right-2 cursor-pointer transition-transform text-2xl ${open ? "text-white " : "md:text-white text-black "}  `}
+          className={`absolute top-4 right-2 cursor-pointer transition-transform text-2xl ${
+            open ? "text-white " : "md:text-white text-black "
+          }  `}
           onClick={() => setOpen(!open)}
           fontSize="small"
         />
@@ -39,7 +40,9 @@ const Layout = () => {
             src={logo}
             alt="Image"
             className={`transition-all duration-500 ${
-              open ? "w-20 h-20 mt-1" : "md:w-14 md:h-14 md:mt-12 md:mr-5 w-9 h-9 mr-10"
+              open
+                ? "w-20 h-20 mt-1"
+                : "md:w-14 md:h-14 md:mt-12 md:mr-5 w-9 h-9 mr-10"
             }`}
           />
           <h1
@@ -54,20 +57,25 @@ const Layout = () => {
         <div className="row-span-10 mt-4 ">
           <ul className="pt-2">
             {Menus.map((menu, index) => (
-              <React.Fragment key={index} >
-                <NavLink to={menu.to}> 
+              <React.Fragment key={index}>
+                <NavLink to={menu.to}>
                   <li
                     className={` cursor-pointer text-md flex items-center gap-x-3 p-2 mt-1 pl-3 transition-all duration-700 hover:bg-gray-200 hover:text-primary  ${
-                      location.pathname === menu.to 
-                        ? `${ open ?  "bg-gray-200 text-primary transition-all duration-500" : "md:bg-gray-200 md:text-primary md:transition-all md:duration-500 duration-75"}`
+                      location.pathname === menu.to
+                        ? `${
+                            open
+                              ? "bg-gray-200 text-primary transition-all duration-500"
+                              : "md:bg-gray-200 md:text-primary md:transition-all md:duration-500 duration-75"
+                          }`
                         : "text-white  "
                     }`}
-                  
                   >
                     <div className="flex items-center gap-x-2">
                       <span
                         className={`md:block md:float-left ${
-                          open ? "md:text-2xl" : "md:text-3xl md:ml-3 md:opacity-100 opacity-0"
+                          open
+                            ? "md:text-2xl"
+                            : "md:text-3xl md:ml-3 md:opacity-100 opacity-0"
                         }`}
                       >
                         <div className="">{menu.icon}</div>
@@ -111,11 +119,10 @@ const Layout = () => {
         }`}
       >
         <Header />
-        <Suspense >
+        <Suspense>
           <Outlet />
         </Suspense>
       </div>
-
     </div>
   );
 };

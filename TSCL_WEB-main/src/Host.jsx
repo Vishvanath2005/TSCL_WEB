@@ -1,4 +1,4 @@
-export const API = "https://api.maduraismartcity.com"
+export const API = "http://localhost:4000"
 
 export function formatDate(dateString) {
     const date = new Date(dateString);

@@ -18,6 +18,7 @@ import Profile from "./pages/profile/Profile";
 // import Tabs from "./pages/dashboard/tabs/Tabs";
 import Guestform from "./pages/guest/Guestform";
 import LandingPage from "./pages/landing page/LandingPage";
+import Dashboard from "./pages/dashboard/Dashboard";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -32,6 +33,7 @@ function App() {
           <Route path="" element={<LandingPage/>}/>
           <Route path="/" element={<Layout />}>
             <Route path="/closed" element={<Closed />} />
+            <Route path="/dashboard" element={<Dashboard />}/>
             <Route path="/form" element={<GrievancesForm />} />
             <Route path="/report" element={<Report />} />
             <Route path="/viewreport" element={<Viewreport />} />

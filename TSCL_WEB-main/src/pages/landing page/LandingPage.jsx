@@ -248,7 +248,7 @@ const LandingPage = () => {
                 </div>
 
                 {/* Dotted Downward Arrow */}
-                <div className="col-span-6  flex flex-col px-52 items-end">
+                <div className="col-span-6  flex flex-col px-56 items-end">
                   <div className="h-16 border-l-2 border-dashed border-gray-600 px-[2.4px]"></div>
                   <div className="w-0 h-0 border-t-[12px] border-l-[6px] border-r-[6px] border-t-gray-600 border-l-transparent border-r-transparent mt-[-1px]"></div>
                 </div>
