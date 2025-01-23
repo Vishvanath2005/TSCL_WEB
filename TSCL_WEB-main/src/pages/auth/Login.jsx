@@ -45,6 +45,7 @@ const Login = ({ setToken }) => {
     let token = null;
 
     try {
+      console.log(data);
       
       const response = await axios.post(`${API}/public-user/loginweb`, data);
       

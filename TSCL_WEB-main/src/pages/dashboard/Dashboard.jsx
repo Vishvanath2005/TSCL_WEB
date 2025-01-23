@@ -54,7 +54,7 @@ const Dashboard = () => {
     try {
       setIsLoading(true);
       const response = await axios.get(
-        `${API}/new-grievance/getbyuserid?public_user_id=${code}`,
+        `${API}/new-grievance/getbyuseridfull?public_user_id=${code}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

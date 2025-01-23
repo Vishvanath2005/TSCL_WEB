@@ -30,6 +30,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/auth" element={<OTP />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/gform" element={<Guestform />} />
           <Route path="" element={<LandingPage/>}/>
           <Route path="/" element={<Layout />}>
             <Route path="/closed" element={<Closed />} />
@@ -39,6 +40,7 @@ function App() {
             <Route path="/viewreport" element={<Viewreport />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/view" element={<ViewRequest />} />
+          
             {/* <Route path="/tabs" element={<Tabs />} /> */}
            
           </Route>

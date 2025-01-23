@@ -9,6 +9,8 @@ import ContactUs from "./ContactUs";
 import Terms from "./Terms";
 import PrivacyPolicy from "./PrivacyPolicy";
 import { Link, useNavigate } from "react-router-dom";
+import GrievancesForm from "../grievances/GrievancesForm";
+import Guestform from "../guest/Guestform";
 
 const LandingPage = () => {
   const [language, setLanguage] = useState("en");
@@ -147,11 +149,22 @@ const LandingPage = () => {
                 {translations[language].home}
               </a>
               <a
+              
+                onClick={() => handleLinkClick("/gform")}
+                className={`lg:px-6 md:px-6 px-2 py-2 rounded-md ${
+                  activeLink === "/gform"
+                    ? "text-white bg-[#21409A]"
+                    : "text-black border"
+                }`}
+              >
+                <p>File a Grievance</p>
+              </a>
+              <a
                 onClick={() => handleLinkClick("/contactus")}
                 className={`md:px-6 px-2 text-wrap py-2 rounded-lg ${
                   activeLink === "/contactus"
                     ? "text-white bg-[#21409A]"
-                    : "text-black"
+                    : "text-black border"
                 }`}
               >
                 {translations[language].contactUs}
@@ -170,8 +183,6 @@ const LandingPage = () => {
             </nav>
           </div>
         </header>
-
-        {/* homepage content */}
         {activeLink === "" && (
           <main className="lg:pt-28 md:pt-28 pt-40 lg:space-y-40 md:space-y-48 space-y-28 ">
             <section className="">
@@ -200,7 +211,10 @@ const LandingPage = () => {
                     </div>
                     <p>{translations[language].fileGrievance}</p>
                   </button>
-                  <a href="https://portal.maduraismartcity.com/" className="lg:px-8 md:px-8 px-1.5 lg:py-8 md:py-8 py-1.5 flex flex-col items-center justify-center gap-1 bg-[#E6D590] rounded-lg lg:h-full md:h-full  h-28">
+                  <a
+                    href="https://portal.maduraismartcity.com/"
+                    className="lg:px-8 md:px-8 px-1.5 lg:py-8 md:py-8 py-1.5 flex flex-col items-center justify-center gap-1 bg-[#E6D590] rounded-lg lg:h-full md:h-full  h-28"
+                  >
                     <button className=" flex-col flex justify-center items-center space-y-1">
                       <div className="bg-[#21409A] rounded-full w-fit lg:px-4 md:px-4 px-2 lg:py-4 md:py-4 py-2 ">
                         <FiFile className="lg:size-6 md:size-6 size-4  text-[#E6D590]" />
@@ -217,7 +231,6 @@ const LandingPage = () => {
                 {translations[language].stepsTitle}
               </h2>
               <div className="grid lg:grid-cols-5 md:grid-cols-5 grid-cols-1 items-center gap-4 lg:w-4/5 md:w-4/5 mx-auto ">
-                {/* Step 1 */}
                 <div className=" col-span-2 flex justify-center items-center p-6 bg-[#FFF5CE] rounded-lg">
                   <div className="bg-white shadow-md lg:px-8 md:px-2 px-6 lg:py-10 md:py-10 py-10 text-center w-full space-y-2">
                     <h3 className="font-bold text-xl text-[#21409A] ">
@@ -231,10 +244,6 @@ const LandingPage = () => {
                     </p>
                   </div>
                 </div>
-
-                {/* Vertical or Horizontal Arrow */}
-
-                {/* Horizontal Arrow for large and medium screens */}
                 <div className="hidden lg:flex md:flex items-center">
                   <div className="border-t-2 border-dashed border-gray-600 flex-grow "></div>
                   <div className="border-t-[8px] border-b-[8px] border-l-[12px] border-transparent border-l-gray-600"></div>
@@ -261,14 +270,6 @@ const LandingPage = () => {
                     </p>
                   </div>
                 </div>
-
-                {/* Dotted Downward Arrow */}
-                {/* <div className="lg:col-span-6 md:col-span-12 hidden lg:flex md:flex lg:flex-col md:flex-col lg:px-52 md:px-52 lg:items-end md:items-end">
-                  <div className="h-20 border-l-2 border-dashed border-gray-600 px-[2.4px]"></div>
-                  <div className="w-0 h-0 border-t-[12px] border-l-[6px] border-r-[6px] border-t-gray-600 border-l-transparent border-r-transparent mt-[-1px]"></div>
-                </div> */}
-
-                {/* Vertical Arrow for small screens */}
                 <div className="lg:hidden md:hidden flex items-center justify-center lg:w-full md:w-full w-full ">
                   <div className=" flex flex-col items-center">
                     <div className="h-12 border-l-2 border-dashed border-gray-600"></div>
@@ -324,7 +325,6 @@ const LandingPage = () => {
             </section>
           </main>
         )}
-
         {/* Contact us content */}
         {activeLink === "/contactus" && (
           <main className="lg:pt-28 md:pt-28 pt-44">
@@ -335,6 +335,11 @@ const LandingPage = () => {
         {activeLink === "/terms" && (
           <main className="lg:pt-28 md:pt-28 pt-44">
             <Terms language={language} />
+          </main>
+        )}{" "}
+        {activeLink === "/gform" && (
+          <main className="lg:pt-28 md:pt-28 pt-44">
+            <Guestform language={language} />
           </main>
         )}
         {activeLink === "/privacy" && (
