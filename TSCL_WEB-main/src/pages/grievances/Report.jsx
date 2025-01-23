@@ -147,13 +147,13 @@ const Report = () => {
   };
 
   return (
-    <div className="overflow-y-auto  no-scrollbar">
-      <div className="font-lexend h-screen ">
+    <div className="overflow-y-auto no-scrollbar">
+      <div className="font-lexend h-screen">
+        {/* Header Section */}
         <div className="flex justify-between items-center my-2 mx-8 gap-1 flex-wrap">
-          <h1 className="md:text-xl text-lg font-bold">My Report</h1>
-
+          <h1 className="text-lg md:text-xl font-bold">My Report</h1>
           <button
-            className="flex  flex-row-2 gap-2 font-medium font-lexend items-center border-2 bg-blue-500 text-white rounded-full py-2 px-3 justify-between md:text-base text-sm"
+            className="flex gap-2 font-medium items-center border-2 bg-blue-500 text-white rounded-full py-2 px-3 justify-between text-sm md:text-base"
             onClick={() =>
               navigate(`/form`, {
                 state: { grievanceId: report.grievance_id },
@@ -164,56 +164,63 @@ const Report = () => {
           </button>
         </div>
 
-        <div className="bg-white h-4/5 mx-3 rounded-lg p-3">
-          <div className="flex justify-between items-center gap-6 mt-2 mx-3">
-            <div className="flex items-center gap-3 mx-3">
-              <div className=" flex items-center gap-10">
+        <div className="bg-white mx-3 rounded-lg p-3 h-4/5">
+          <div className="flex justify-between items-center gap-6 mt-2 mx-3 flex-wrap">
+            <div className="grid grid-cols-12 gap-3 w-full mx-3">
+              {/* View Report Text */}
+              <div className="col-span-12 sm:col-span-4 md:col-span-2 flex items-center justify-start">
                 <p className="text-lg whitespace-nowrap">View Report</p>
+              </div>
 
-                <div className="flex items-center gap-3  border-2 w-fit py-1.5 rounded-lg border-primary pr-3 mx-3">
-                  <DateRangeComp onChange={handleDateRangeChange} />
-                </div>
-                <div className="border-2 border-blue-700 px-2 py-1 flex gap-3 rounded-lg">
-                  <label
-                    htmlFor="itemsPerPage"
-                    className="font-medium text-gray-600"
-                  >
-                    Page Entries:
-                  </label>
+              {/* Date Range Component */}
+              <div className="col-span-12 sm:col-span-4 md:col-span-4 flex items-center gap-3 border-2 w-fit  py-1.5 rounded-lg border-primary pr-3">
+                <DateRangeComp onChange={handleDateRangeChange} />
+              </div>
 
-                  <select
-                    id="itemsPerPage"
-                    value={itemsPerPage}
-                    onChange={handleItemsPerPageChange}
-                    className="p-1 outline-none border bg-blue-500 text-white text-sm rounded-lg px-2"
-                  >
-                    {[5, 10, 20, 50].map((num) => (
-                      <option key={num} value={num}>
-                        {num}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              {/* Page Entries Dropdown */}
+              <div className="col-span-12  justify-center sm:col-span-4 md:col-span-3 flex items-center border-2 w-fit border-blue-700 px-2 py-1 rounded-lg">
+                <label
+                  htmlFor="itemsPerPage"
+                  className="font-medium text-gray-600 mr-2"
+                >
+                  Page Entries:
+                </label>
+                <select
+                  id="itemsPerPage"
+                  value={itemsPerPage}
+                  onChange={handleItemsPerPageChange}
+                  className="p-1 outline-none border bg-blue-500 text-white text-sm rounded-lg"
+                >
+                  {[5, 10, 20, 50].map((num) => (
+                    <option key={num} value={num}>
+                      {num}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Status Dropdown */}
+              <div className="col-span-12 sm:col-span-4 md:col-span-3 flex justify-end items-end">
+                <select
+                  className="block w-fit px-3 py-2 text-center text-sm bg-primary text-white border-none rounded-full hover:border-gray-200 outline-none capitalize"
+                  onChange={(e) => handleStatusChange(e.target.value)}
+                  value={selectedStatus || ""}
+                >
+                  <option hidden>Status</option>
+                  <option value="All">All</option>
+                  {status.map((option) => (
+                    <option key={option.status_name} value={option.status_name}>
+                      {option.status_name}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
-            <select
-              className="block items-center w-fit px-1 py-2 text-center text-sm bg-primary text-white border border-none rounded-full hover:border-gray-200 outline-none capitalize"
-              onChange={(e) => handleStatusChange(e.target.value)}
-              value={selectedStatus || ""}
-            >
-              <option hidden>Status</option>
-              <option value="All">All</option>
-              {status.map((option) => (
-                <option key={option.status_name} value={option.status_name}>
-                  {option.status_name}
-                </option>
-              ))}
-            </select>
           </div>
 
           <div className="rounded-lg w-full overflow-x-auto no-scrollbar flex justify-center">
             <div className="w-full overflow-y-auto max-h-[540px]">
-              <table className="w-full mt-3 ">
+              <table className="w-full mt-3">
                 <thead className="border-b border-gray-300">
                   <tr>
                     {[
@@ -233,7 +240,6 @@ const Report = () => {
                         </p>
                       </th>
                     ))}
-
                     <th className="text-center font-semibold py-2">
                       <p className="mx-7 my-2 flex gap-2 items-center">
                         Status <RiExpandUpDownLine />
@@ -259,11 +265,10 @@ const Report = () => {
                           {report.grievance_id}
                         </p>
                       </td>
-
                       <td className="text-start mx-1.5 my-2 font-lexend text-sm">
                         {formatDate(report.createdAt)}
                       </td>
-                      <td className="text-start flex justify-start  font-lexend text-sm">
+                      <td className="text-start flex justify-start font-lexend text-sm">
                         <img
                           src={grievanceImages[report.grievance_mode] || logo}
                           alt={report.grievance_mode}
@@ -277,8 +282,7 @@ const Report = () => {
                         {report.dept_name}
                       </td>
                       <td>
-                        {" "}
-                        <p className=" text-start mx-1.5  my-2 font-lexend whitespace-nowrap text-sm capitalize text-gray-700">
+                        <p className="text-start mx-1.5 my-2 font-lexend whitespace-nowrap text-sm capitalize text-gray-700">
                           {report.assign_username
                             ? report.assign_username
                             : "Yet to be assigned"}
@@ -303,6 +307,7 @@ const Report = () => {
           </div>
         </div>
 
+        {/* Pagination Section */}
         <div className="mt-4 mb-5 mx-7">
           <nav className="flex items-center flex-column flex-wrap md:flex-row md:justify-between justify-center">
             <span className="text-sm font-normal text-gray-700 mb-4 md:mb-0 block w-full md:inline md:w-auto text-center font-alegerya">
