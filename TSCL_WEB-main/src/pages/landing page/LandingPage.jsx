@@ -8,13 +8,14 @@ import { BsGlobe } from "react-icons/bs";
 import ContactUs from "./ContactUs";
 import Terms from "./Terms";
 import PrivacyPolicy from "./PrivacyPolicy";
+import { Link, useNavigate } from "react-router-dom";
 
 const LandingPage = () => {
   const [language, setLanguage] = useState("en");
   const [activeLink, setActiveLink] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Check localStorage for language preference and set the state
     const savedLanguage = localStorage.getItem("language");
     if (savedLanguage) {
       setLanguage(savedLanguage);
@@ -24,7 +25,7 @@ const LandingPage = () => {
   const handleLanguageChange = (event) => {
     const selectedLanguage = event.target.value;
     setLanguage(selectedLanguage);
-    localStorage.setItem("language", selectedLanguage); // Save the language to localStorage
+    localStorage.setItem("language", selectedLanguage);
   };
 
   const translations = {
@@ -112,9 +113,12 @@ const LandingPage = () => {
     },
   };
 
-
   const handleLinkClick = (link) => {
     setActiveLink(link);
+  };
+
+  const login = () => {
+    navigate(`/login`);
   };
 
   return (
@@ -172,26 +176,38 @@ const LandingPage = () => {
           <main className="lg:pt-28 md:pt-28 pt-40 lg:space-y-40 md:space-y-48 space-y-28 ">
             <section className="">
               <div className="relative ">
-                <img src={MsclMain} alt="Madurai city" className="rounded-[40px]" />
+                <img
+                  src={MsclMain}
+                  alt="Madurai city"
+                  className="rounded-[40px]"
+                />
                 <div className="absolute -translate-y-1/3 left-1/2 transform -translate-x-1/2 lg:grid md:grid flex lg:grid-cols-3 md:grid-cols-3  lg:gap-6 md:gap-6 gap-3 bg-white lg:p-6 md:p-6 p-3 lg:w-4/5 md:w-4/5 w-6/6 justify-center items-center  rounded-xl shadow-md px-2">
-                  <button className="lg:px-8 md:px-8 px-1.5 lg:py-8 md:py-8 py-1.5 flex flex-col items-center justify-center gap-1 bg-[#E6D590] rounded-lg lg:h-full md:h-full h-28">
+                  <button
+                    onClick={login}
+                    className="lg:px-8 md:px-8 px-1.5 lg:py-8 md:py-8 py-1.5 flex flex-col items-center justify-center gap-1 bg-[#E6D590] rounded-lg lg:h-full md:h-full h-28"
+                  >
                     <div className="bg-[#21409A] rounded-full lg:px-4 md:px-4 px-2 lg:py-4 md:py-4 py-2 ">
                       <TbBulb className="lg:size-6 md:size-6 size-4 text-[#E6D590]" />
                     </div>
                     <p>{translations[language].grievance}</p>
                   </button>
-                  <button className="lg:px-8 md:px-8 px-1.5 lg:py-8 md:py-8 py-1.5 flex flex-col items-center justify-center gap-1 bg-[#E6D590] rounded-lg lg:h-full md:h-full  h-28">
+                  <button
+                    onClick={login}
+                    className="lg:px-8 md:px-8 px-1.5 lg:py-8 md:py-8 py-1.5 flex flex-col items-center justify-center gap-1 bg-[#E6D590] rounded-lg lg:h-full md:h-full  h-28"
+                  >
                     <div className="bg-[#21409A] rounded-full lg:px-4 md:px-4 px-2 lg:py-4 md:py-4 py-2 ">
                       <GrLogin className="lg:size-6 md:size-6 size-4 text-[#E6D590] " />
                     </div>
                     <p>{translations[language].fileGrievance}</p>
                   </button>
-                  <button className="lg:px-8 md:px-8 px-1.5 lg:py-8 md:py-8 py-1.5 flex flex-col items-center justify-center gap-1 bg-[#E6D590] rounded-lg lg:h-full md:h-full  h-28">
-                    <div className="bg-[#21409A] rounded-full lg:px-4 md:px-4 px-2 lg:py-4 md:py-4 py-2 ">
-                      <FiFile className="lg:size-6 md:size-6 size-4 text-[#E6D590]" />
-                    </div>
-                    <p>{translations[language].officerLogin}</p>
-                  </button>
+                  <a href="https://portal.maduraismartcity.com/" className="lg:px-8 md:px-8 px-1.5 lg:py-8 md:py-8 py-1.5 flex flex-col items-center justify-center gap-1 bg-[#E6D590] rounded-lg lg:h-full md:h-full  h-28">
+                    <button className=" flex-col flex justify-center items-center space-y-1">
+                      <div className="bg-[#21409A] rounded-full w-fit lg:px-4 md:px-4 px-2 lg:py-4 md:py-4 py-2 ">
+                        <FiFile className="lg:size-6 md:size-6 size-4  text-[#E6D590]" />
+                      </div>
+                      <p>{translations[language].officerLogin}</p>
+                    </button>
+                  </a>
                 </div>
               </div>
             </section>
@@ -329,7 +345,6 @@ const LandingPage = () => {
       </div>
       <footer className="mt-12   text-white bg-[#21409A] font-roboto ">
         <div className=" py-6 mx-3  space-y-4">
-         
           <div className=" grid grid-cols-2  mx-8 ">
             <div className="sm:col-span-1 col-span-2">
               <p>Phone: 9585912344</p>
@@ -341,7 +356,10 @@ const LandingPage = () => {
               </p>
               <p className="flex flex-col">
                 <span>Address: 1255, Madurai Corporation Building,</span>
-                <span> Melur Road, Tallakulam, Madurai, Tamil Nadu, 625020.</span>
+                <span>
+                  {" "}
+                  Melur Road, Tallakulam, Madurai, Tamil Nadu, 625020.
+                </span>
               </p>
             </div>
             <nav className="sm:items-end items-start sm:col-span-1 col-span-2 flex flex-col  justify-end text-end font-normal text-sm text-[#D9D9D9] py-4 gap-2">
