@@ -30,7 +30,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/auth" element={<OTP />} />
           <Route path="/signup" element={<SignUp />} />
-          <Route path="/whatsapp_complaints" element={<Guestform />} />
+          <Route path="/whatsappcomplaints" element={<Guestform />} />
           <Route path="" element={<LandingPage/>}/>
           <Route path="/" element={<Layout />}>
             <Route path="/closed" element={<Closed />} />

@@ -404,11 +404,11 @@ const Guestform = ({ language }) => {
         <div className="py-2">
           <p className="font-semibold flex justify-between items-center py-2 text-white text-2xl font-roboto">
             <span> {translations.en.grievance_form} </span>
-            <div className="flex gap-3 border  items-center px-2.5 rounded-lg"
+            {/* <div className="flex gap-3 border  items-center px-2.5 rounded-lg"
             onClick={back}>
               <IoArrowBackOutline />
               <p>Back</p>
-            </div>
+            </div> */}
           </p>
           <div className="bg-white mt-3 rounded-lg pb-2">
             <div className="border-2 rounded-lg">
