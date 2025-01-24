@@ -143,7 +143,7 @@ const LandingPage = () => {
                 href=""
                 onClick={() => handleLinkClick("")}
                 className={`lg:px-6 md:px-6 px-2 py-2 rounded-md ${
-                  activeLink === "" ? "text-white bg-[#21409A]" : "text-black"
+                  activeLink === "" ? "text-white bg-[#21409A]" : "text-black border"
                 }`}
               >
                 {translations[language].home}

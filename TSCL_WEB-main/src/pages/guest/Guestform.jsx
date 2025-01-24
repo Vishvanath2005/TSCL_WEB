@@ -12,6 +12,7 @@ import decryptData from "../../Decrypt";
 import { useSelector } from "react-redux";
 import OtpInput from "otp-input-react";
 import { AiOutlineLoading } from "react-icons/ai";
+import { IoArrowBackOutline } from "react-icons/io5";
 
 const UserInfoSchema = yup.object().shape({
   public_user_name: yup.string().required("Name is required"),
@@ -401,8 +402,13 @@ const Guestform = ({ language }) => {
     <div className="bg-blue-600 h-full overflow-auto">
       <div className="m-6 overflow-auto no-scrollbar space-y-8">
         <div className="py-2">
-          <p className="font-semibold py-2 text-white text-2xl font-roboto">
-            {translations.en.grievance_form}
+          <p className="font-semibold flex justify-between items-center py-2 text-white text-2xl font-roboto">
+            <span> {translations.en.grievance_form} </span>
+            <div className="flex gap-3 border  items-center px-2.5 rounded-lg"
+            onClick={back}>
+              <IoArrowBackOutline />
+              <p>Back</p>
+            </div>
           </p>
           <div className="bg-white mt-3 rounded-lg pb-2">
             <div className="border-2 rounded-lg">
