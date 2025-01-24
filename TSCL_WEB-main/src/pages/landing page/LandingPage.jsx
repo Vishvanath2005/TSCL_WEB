@@ -203,7 +203,7 @@ const LandingPage = () => {
                     <p>{translations[language].grievance}</p>
                   </button>
                   <button
-                    onClick={() => navigate("/whatsapp_complaints")}
+                    onClick={() => navigate("/whatsappcomplaints")}
                     className="lg:px-8 md:px-8 px-1.5 lg:py-8 md:py-8 py-1.5 flex flex-col items-center justify-center gap-1 bg-[#E6D590] rounded-lg lg:h-full md:h-full  h-28"
                   >
                     <div  className="bg-[#21409A] rounded-full lg:px-4 md:px-4 px-2 lg:py-4 md:py-4 py-2 ">
