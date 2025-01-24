@@ -32,7 +32,7 @@ const LandingPage = () => {
 
   const translations = {
     en: {
-      title: "Madurai Smart City",
+      title: "Madurai Municipal Corporation",
       home: "Home",
       dashboard: "Dashboard",
       contactUs: "Contact Us",
@@ -69,7 +69,7 @@ const LandingPage = () => {
       privacy: "Privacy Policy",
       contactUs: "Contact us",
       aboutUs: "About us",
-      rightsReserved: "All rights reserved © Madurai Smart City 2025",
+      rightsReserved: "All rights reserved © Madurai Municipal Corporation 2025",
     },
     ta: {
       title: "மதுரை ஸ்மார்ட் சிட்டி",
@@ -150,7 +150,7 @@ const LandingPage = () => {
               </a>
               <a
               
-                onClick={() => handleLinkClick("/gform")}
+                onClick={() => navigate("/whatsapp_complaints")}
                 className={`lg:px-6 md:px-6 px-2 py-2 rounded-md ${
                   activeLink === "/gform"
                     ? "text-white bg-[#21409A]"
@@ -337,11 +337,6 @@ const LandingPage = () => {
             <Terms language={language} />
           </main>
         )}{" "}
-        {activeLink === "/gform" && (
-          <main className="lg:pt-28 md:pt-28 pt-44">
-            <Guestform language={language} />
-          </main>
-        )}
         {activeLink === "/privacy" && (
           <main className="lg:pt-28 md:pt-28 pt-44">
             <PrivacyPolicy language={language} />
