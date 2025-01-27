@@ -205,28 +205,23 @@ const Guestform = ({ language }) => {
       user_status: "active",
     };
 
-    // const getPriorityFromComplaintType = (complaintTypeTitle) => {
-    //   const Complaint = Complaint.data.find(
-    //     (complaint) => complaint.complaint_type_title === complaintTypeTitle
-    //   );
-    //   return complaint ? complaint.priority : null;
-    // };
-
     let public_user_id;
     if (autoFillData) {
-      const response = await axios.post(`${API}/public-user/post`, userInfo);
       public_user_id = autoFillData.public_user_id;
+    } else {
+      const response = await axios.post(`${API}/public-user/post`, userInfo);
+      public_user_id = decryptData(response.data.data);
     }
 
     const grievanceDetails = {
       grievance_mode: `website`,
-      complaint_type_title: data.complaint,
+      complaint_type_title: data.complaint_type_title,
       dept_name: data.dept_name,
       zone_name: data.zone_name,
       ward_name: data.ward_name,
       street_name: data.street_name,
       pincode: data.pincode,
-      complaint: data.complaint_type_title,
+      complaint: data.complaint,
       complaint_details: data.complaint_details,
       public_user_id: public_user_id,
       public_user_name: data.public_user_name,
@@ -234,34 +229,33 @@ const Guestform = ({ language }) => {
       status: "new",
       statusflow: "new",
     };
-    console.log(data);
 
     try {
-      console.log(data);
-
       const response1 = await axios.post(
         `${API}/new-grievance/postguest`,
         grievanceDetails
       );
-      console.log(response1);
       const grievanceId = await response1.data.data;
-      const whatsappcomplaints = {
-        mobile_number: "91"+ grievanceId.phone,
-        variable: {
-          resident_name:grievanceId.public_user_name,
-          grievance_id: grievanceId.grievance_id,
-          assign_username: "R. RAMASUBRAMANIAN",
-          assign_userphone: "9498748607",
-        },
-        template_id: "complaint_registration",
-      };
+      console.log(grievanceId);
+
       if (response1.status === 200) {
         toast.success("Grievance created Successfully");
+        const whatsappcomplaints = {
+          mobile_number: "917708209937",
+          variable: {
+            resident_name: "Rk",
+            grievance_id: "MMC0001",
+            assign_username: "R. RAMASUBRAMANIAN",
+            assign_userphone: "9498748607",
+          },
+          template_id: "complaint_registration",
+        };
+        console.log(whatsappcomplaints);
+
         const response4 = await axios.post(
-          `https://app.kwic.in/api/v1/push?api_key=67973db6a4684146de808250
-`,
+          `https://app.kwic.in/api/v1/push?api_key=67973db6a4684146de808250`,
           whatsappcomplaints
-        )
+        );
         console.log(whatsappcomplaints);
         console.log(response4);
         onSignup();

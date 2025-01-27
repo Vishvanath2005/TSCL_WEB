@@ -191,9 +191,11 @@ const GrievancesForm = () => {
 
     let public_user_id;
     if (autoFillData) {
-      const response = await axios.post(`${API}/public-user/post`, userInfo);
       public_user_id = autoFillData.public_user_id;
-    } 
+    } else {
+      const response = await axios.post(`${API}/public-user/post`, userInfo);
+      public_user_id = decryptData(response.data.data);
+    }
 
     const grievanceDetails = {
       grievance_mode: `website`,
