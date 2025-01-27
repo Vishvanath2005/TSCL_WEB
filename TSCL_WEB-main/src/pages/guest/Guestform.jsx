@@ -11,8 +11,7 @@ import { useNavigate } from "react-router-dom";
 import decryptData from "../../Decrypt";
 import { useSelector } from "react-redux";
 import OtpInput from "otp-input-react";
-import { AiOutlineLoading } from "react-icons/ai";
-import { IoArrowBackOutline } from "react-icons/io5";
+import { CgSpinner } from "react-icons/cg";
 
 const UserInfoSchema = yup.object().shape({
   public_user_name: yup.string().required("Name is required"),
@@ -64,6 +63,9 @@ const Guestform = ({ language }) => {
   const [showOTP, setShowOTP] = useState(false);
   const [otp, setOtp] = useState("");
   const [isSaving, setisSaving] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [timer, setTimer] = useState(90);
+  const [canResend, setCanResend] = useState(false);
 
   const {
     register,
@@ -242,11 +244,26 @@ const Guestform = ({ language }) => {
         grievanceDetails
       );
       console.log(response1);
-
       const grievanceId = await response1.data.data;
-
+      const whatsappcomplaints = {
+        mobile_number: "91"+ grievanceId.phone,
+        variable: {
+          resident_name:grievanceId.public_user_name,
+          grievance_id: grievanceId.grievance_id,
+          assign_username: "R. RAMASUBRAMANIAN",
+          assign_userphone: "9498748607",
+        },
+        template_id: "complaint_registration",
+      };
       if (response1.status === 200) {
         toast.success("Grievance created Successfully");
+        const response4 = await axios.post(
+          `https://app.kwic.in/api/v1/push?api_key=67973db6a4684146de808250
+`,
+          whatsappcomplaints
+        )
+        console.log(whatsappcomplaints);
+        console.log(response4);
         onSignup();
       }
       if (files.length > 0) {
@@ -351,7 +368,7 @@ const Guestform = ({ language }) => {
 
   const onSignup = () => {
     // Trim the phone number and check if it's valid
-
+    setLoading(true);
     if (!/^\d{10}$/.test(PhoneNo)) {
       toast.error(
         "Invalid phone number. Please enter a valid 10-digit number."
@@ -371,15 +388,18 @@ const Guestform = ({ language }) => {
         window.confirmationResult = confirmationResult; // Save confirmation result
         console.log("OTP sent to:", formattedPh);
         setShowOTP(true);
+        setLoading(false);
         toast.success("OTP sent successfully!");
       })
       .catch((error) => {
+        setLoading(false);
         console.error("Error during signInWithPhoneNumber:", error);
         toast.error("Failed to send OTP. Please try again.");
       });
   };
 
   function onVerifyOTP() {
+    setLoading(true);
     window.confirmationResult
       .confirm(otp)
       .then(async (res) => {
@@ -390,9 +410,26 @@ const Guestform = ({ language }) => {
         setShowOTP(false);
       })
       .catch((err) => {
+        setLoading(false);
         console.log(err);
       });
   }
+
+  const handleResendOtp = async () => {};
+
+  const formatTime = (time) => {};
+
+  useEffect(() => {
+    if (timer <= 0) {
+      setCanResend(true);
+      return;
+    }
+    const interval = setInterval(() => {
+      setTimer((prevTime) => prevTime - 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [timer]);
 
   const back = () => {
     navigate("/");
@@ -753,23 +790,15 @@ const Guestform = ({ language }) => {
                   )}
                 </div>
               </div>
-              <div className=" text-center my-3">
+              <div className=" text-center my-3 flex justify-center">
                 <button
                   type="submit"
-                  className={`my-6 text-white bg-blue-500 rounded-lg px-14 py-2 ${
-                    isSaving ? "opacity-50 cursor-not-allowed" : ""
-                  } `}
-                  disabled={isSaving}
+                  className="bg-blue-500 w-fit rounded-lg text-white px-4 text-xl py-2 flex gap-2 justify-center items-center"
                 >
-                  {isSaving ? (
-                    <div className="flex  text-xl gap-2">
-                      <AiOutlineLoading className="h-6 w-6 animate-spin" />
-                      <p>Saving....</p>
-                    </div>
-                  ) : (
-                    "Save"
-                  )}
-                         
+                  {loading && (
+                    <CgSpinner className="text-5xl px-3 items-center animate-spin my-1" />
+                  )}{" "}
+                  Submit
                 </button>
               </div>
             </form>
@@ -778,7 +807,7 @@ const Guestform = ({ language }) => {
       </div>
       {showOTP && (
         <div className="fixed inset-0 bg-black bg-opacity-25 backdrop-blur-sm flex  justify-center items-center">
-          <div className="bg-white w-fit h-64  font-lexend m-2 mx-5 overflow-auto">
+          <div className="bg-white w-fit h-fit rounded-md font-lexend m-2 mx-5 overflow-auto">
             <div className="flex justify-between mx-3 mt-2 items-center">
               <p className="pt-2 text-lg text-slate-900 pl-5">Verify Otp</p>
               <p className="text-3xl pr-5" onClick={() => setShowOTP(!showOTP)}>
@@ -798,11 +827,23 @@ const Guestform = ({ language }) => {
                   className="otp-input-container"
                 />
               </div>
+            </div>
+            <div className="flex justify-evenly">
               <button
                 onClick={onVerifyOTP}
-                className="border w-fit flex justify-center rounded-lg bg-white text-blue-500 font-semibold items-center px-2"
+                className="border w-fit p-2 flex justify-center rounded-lg bg-blue-500 text-white font-semibold my-4 items-center px-2"
               >
+                {loading && (
+                  <CgSpinner className="text-5xl px-3 items-center animate-spin my-1" />
+                )}
                 Verify Otp
+              </button>{" "}
+              <button
+                onClick={() => canResend && handleResendOtp()}
+                className="border w-fit p-2 flex justify-center rounded-lg bg-blue-500 text-white font-semibold my-4 items-center px-2"
+              >
+                Resend Otp
+                <p className="text-lg font-extralight ">{formatTime(timer)}</p>
               </button>
             </div>
           </div>
