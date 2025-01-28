@@ -193,111 +193,6 @@ const Guestform = ({ language }) => {
     }
   };
 
-  const onSubmit = async (data) => {
-    const userInfo = {
-      public_user_name: data.public_user_name,
-      phone: data.phone,
-      email: data.email,
-      address: data.address,
-      pincode: data.pincode,
-      login_password: "tscl@123",
-      verification_status: "active",
-      user_status: "active",
-    };
-
-    let public_user_id;
-    if (autoFillData) {
-      public_user_id = autoFillData.public_user_id;
-    } else {
-      const response = await axios.post(`${API}/public-user/post`, userInfo);
-      public_user_id = decryptData(response.data.data);
-    }
-
-    const grievanceDetails = {
-      grievance_mode: `website`,
-      complaint_type_title: data.complaint_type_title,
-      dept_name: data.dept_name,
-      zone_name: data.zone_name,
-      ward_name: data.ward_name,
-      street_name: data.street_name,
-      pincode: data.pincode,
-      complaint: data.complaint,
-      complaint_details: data.complaint_details,
-      public_user_id: public_user_id,
-      public_user_name: data.public_user_name,
-      phone: data.phone,
-      status: "new",
-      statusflow: "new",
-    };
-
-    try {
-      const response1 = await axios.post(
-        `${API}/new-grievance/postguest`,
-        grievanceDetails
-      );
-      const grievanceId = await response1.data.data;
-      console.log(grievanceId);
-
-      if (response1.status === 200) {
-        toast.success("Grievance created Successfully");
-        const whatsappcomplaints = {
-          mobile_number: "917708209937",
-          variable: {
-            resident_name: "Rk",
-            grievance_id: "MMC0001",
-            assign_username: "R. RAMASUBRAMANIAN",
-            assign_userphone: "9498748607",
-          },
-          template_id: "complaint_registration",
-        };
-        console.log(whatsappcomplaints);
-
-        const response4 = await axios.post(
-          `https://app.kwic.in/api/v1/push?api_key=67973db6a4684146de808250`,
-          whatsappcomplaints
-        );
-        console.log(whatsappcomplaints);
-        console.log(response4);
-        onSignup();
-      }
-      if (files.length > 0) {
-        if (files.length > 5) {
-          toast.error("File limit exceeded. Maximum 5 files allowed.");
-        } else {
-          try {
-            const formData = new FormData();
-            for (let i = 0; i < files.length; i++) {
-              formData.append("files", files[i]);
-            }
-            formData.append("grievance_id", grievanceId);
-            formData.append("created_by_user", "admin");
-            const response3 = await axios.post(
-              `${API}/new-grievance-attachment/post`,
-              formData,
-              {
-                headers: {
-                  "Content-Type": "multipart/form-data",
-                },
-              }
-            );
-            if (response3.status === 200) {
-              setFiles([]);
-              toast.success("Attachment created Successfully");
-            }
-          } catch (error) {
-            console.error(error);
-            toast.error("Error creating attachment");
-          }
-        }
-      }
-      setPhone(data.phone);
-      reset();
-    } catch (error) {
-      console.log(error);
-      toast.error("An error occurred during submission. Please try again.");
-    }
-  };
-
   const translations = {
     en: {
       grievance_form: "Complaint Form",
@@ -341,6 +236,135 @@ const Guestform = ({ language }) => {
     },
   };
 
+  
+  const onSubmitWithOTP = async (data) => {
+    setLoading(true);
+
+    // Validate the phone number format
+    if (!/^\d{10}$/.test(PhoneNo)) {
+      toast.error("Invalid phone number. Please enter a valid 10-digit number.");
+      setLoading(false);
+      return;
+    }
+
+    // Initialize reCAPTCHA
+    onCaptchVerify();
+
+    const appVerifier = window.recaptchaVerifier;
+    const formattedPhone = `+91${PhoneNo}`; // Ensure E.164 format
+
+    try {
+      // Send OTP
+      const confirmationResult = await signInWithPhoneNumber(auth, formattedPhone, appVerifier);
+      window.confirmationResult = confirmationResult; // Save confirmation result
+      console.log("OTP sent to:", formattedPhone);
+      setShowOTP(true);
+      setLoading(false);
+      toast.success("OTP sent successfully!");
+    } catch (error) {
+      setLoading(false);
+      console.error("Error during signInWithPhoneNumber:", error);
+      toast.error("Failed to send OTP. Please try again.");
+    }
+  };
+
+  // Function to verify OTP and submit data
+  const onVerifyOTP = async (data) => {
+    setLoading(true);
+
+    try {
+      // Verify OTP
+      const result = await window.confirmationResult.confirm(otp);
+      console.log("OTP Verified:", result);
+      toast.success("OTP verified successfully!");
+
+      // Prepare the data to be sent after OTP verification
+      const userInfo = {
+        public_user_name: data.public_user_name, // Use the actual value from the form
+        phone: PhoneNo,
+        email: data.email, // Use the actual email from the form
+        address: data.address, // Use the actual address from the form
+        pincode: data.pincode, // Use the actual pincode from the form
+        login_password: "tscl@123",
+        verification_status: "active",
+        user_status: "active",
+      };
+
+      let public_user_id;
+      // Assuming some logic to get the public user ID (from autoFillData or elsewhere)
+      if (autoFillData) {
+        public_user_id = autoFillData.public_user_id;
+      } else {
+        const response = await axios.post(`${API}/public-user/post`, userInfo);
+        public_user_id = decryptData(response.data.data);
+      }
+
+      const grievanceDetails = {
+        grievance_mode: "website",
+        complaint_type_title: data.complaint_type_title, // Use the actual data from the form
+        dept_name: data.dept_name, // Use the actual department from the form
+        zone_name: data.zone_name, // Use the actual zone from the form
+        ward_name: data.ward_name, // Use the actual ward from the form
+        street_name: data.street_name, // Use the actual street from the form
+        pincode: data.pincode, // Use the actual pincode from the form
+        complaint: data.complaint, // Use the actual complaint from the form
+        complaint_details: data.complaint_details, // Use the actual complaint details from the form
+        public_user_id: public_user_id,
+        public_user_name: data.public_user_name, // Use the actual user name from the form
+        phone: PhoneNo,
+        status: "new",
+        statusflow: "new",
+      };
+
+      // Submit grievance data
+      const response1 = await axios.post(`${API}/new-grievance/postguest`, grievanceDetails);
+      const grievanceId = await response1.data.data;
+      console.log(grievanceDetails);
+      
+      console.log(grievanceId);
+
+      if (response1.status === 200) {
+        toast.success("Grievance created successfully!");
+
+        // Handle attachments if any
+        if (files.length > 0) {
+          if (files.length > 5) {
+            toast.error("File limit exceeded. Maximum 5 files allowed.");
+          } else {
+            const formData = new FormData();
+            for (let i = 0; i < files.length; i++) {
+              formData.append("files", files[i]);
+            }
+            formData.append("grievance_id", grievanceId);
+            formData.append("created_by_user", "admin");
+
+            const response3 = await axios.post(
+              `${API}/new-grievance-attachment/post`,
+              formData,
+              { headers: { "Content-Type": "multipart/form-data" } }
+            );
+
+            if (response3.status === 200) {
+              setFiles([]);
+              toast.success("Attachment created successfully!");
+            }
+          }
+        }
+
+        // Reset after submission
+        setPhone(""); // Clear the phone number input
+        setOtp(""); // Clear the OTP input
+        back()
+        reset();
+      }
+    } catch (error) {
+      setLoading(false);
+      console.error(error);
+      toast.error("OTP verification failed. Please try again.");
+    }
+  };
+  
+  // Function to initialize reCAPTCHA
   function onCaptchVerify() {
     if (!window.recaptchaVerifier) {
       window.recaptchaVerifier = new RecaptchaVerifier(
@@ -349,65 +373,19 @@ const Guestform = ({ language }) => {
         {
           size: "invisible",
           callback: (response) => {
-            onSignup;
+            // reCAPTCHA solved
           },
           "expired-callback": () => {
-            // Response expired. Ask user to solve reCAPTCHA again.
-            // ...
+            // reCAPTCHA expired, ask user to solve again
           },
         }
       );
     }
   }
-
-  const onSignup = () => {
-    // Trim the phone number and check if it's valid
-    setLoading(true);
-    if (!/^\d{10}$/.test(PhoneNo)) {
-      toast.error(
-        "Invalid phone number. Please enter a valid 10-digit number."
-      );
-      return;
-    }
-
-    onCaptchVerify();
-
-    const appVerifier = window.recaptchaVerifier;
-    const formattedPh = `+91${PhoneNo}`; // Ensure E.164 format
-
-    console.log("Formatted Phone Number:", formattedPh);
-
-    signInWithPhoneNumber(auth, formattedPh, appVerifier)
-      .then((confirmationResult) => {
-        window.confirmationResult = confirmationResult; // Save confirmation result
-        console.log("OTP sent to:", formattedPh);
-        setShowOTP(true);
-        setLoading(false);
-        toast.success("OTP sent successfully!");
-      })
-      .catch((error) => {
-        setLoading(false);
-        console.error("Error during signInWithPhoneNumber:", error);
-        toast.error("Failed to send OTP. Please try again.");
-      });
-  };
-
-  function onVerifyOTP() {
-    setLoading(true);
-    window.confirmationResult
-      .confirm(otp)
-      .then(async (res) => {
-        setShowOTP(res.user);
-        console.log(res);
-        toast.success("Otp verified");
-        back();
-        setShowOTP(false);
-      })
-      .catch((err) => {
-        setLoading(false);
-        console.log(err);
-      });
-  }
+  
+  // Function to initialize reCAPTCHA
+ 
+  
 
   const handleResendOtp = async () => {};
 
@@ -446,7 +424,7 @@ const Guestform = ({ language }) => {
               <p className="font-lexend text-xl p-4">Complaint Details</p>
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <form onSubmit={handleSubmit(onSubmitWithOTP)}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-5 mx-10">
                 <div className="flex flex-col">
                   <label
@@ -824,7 +802,7 @@ const Guestform = ({ language }) => {
             </div>
             <div className="flex justify-evenly">
               <button
-                onClick={onVerifyOTP}
+               onClick={() => onVerifyOTP(watch())}
                 className="border w-fit p-2 flex justify-center rounded-lg bg-blue-500 text-white font-semibold my-4 items-center px-2"
               >
                 {loading && (
