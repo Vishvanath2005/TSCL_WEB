@@ -66,6 +66,7 @@ const Guestform = ({ language }) => {
   const [loading, setLoading] = useState(false);
   const [timer, setTimer] = useState(90);
   const [canResend, setCanResend] = useState(false);
+  const [result, setResult] = React.useState("");
 
   const {
     register,
@@ -236,13 +237,14 @@ const Guestform = ({ language }) => {
     },
   };
 
-  
   const onSubmitWithOTP = async (data) => {
     setLoading(true);
 
     // Validate the phone number format
     if (!/^\d{10}$/.test(PhoneNo)) {
-      toast.error("Invalid phone number. Please enter a valid 10-digit number.");
+      toast.error(
+        "Invalid phone number. Please enter a valid 10-digit number."
+      );
       setLoading(false);
       return;
     }
@@ -255,7 +257,11 @@ const Guestform = ({ language }) => {
 
     try {
       // Send OTP
-      const confirmationResult = await signInWithPhoneNumber(auth, formattedPhone, appVerifier);
+      const confirmationResult = await signInWithPhoneNumber(
+        auth,
+        formattedPhone,
+        appVerifier
+      );
       window.confirmationResult = confirmationResult; // Save confirmation result
       console.log("OTP sent to:", formattedPhone);
       setShowOTP(true);
@@ -271,61 +277,61 @@ const Guestform = ({ language }) => {
   // Function to verify OTP and submit data
   const onVerifyOTP = async (data) => {
     setLoading(true);
-
+  
     try {
       // Verify OTP
       const result = await window.confirmationResult.confirm(otp);
       console.log("OTP Verified:", result);
       toast.success("OTP verified successfully!");
-
+  
       // Prepare the data to be sent after OTP verification
       const userInfo = {
-        public_user_name: data.public_user_name, // Use the actual value from the form
+        public_user_name: data.public_user_name,
         phone: PhoneNo,
-        email: data.email, // Use the actual email from the form
-        address: data.address, // Use the actual address from the form
-        pincode: data.pincode, // Use the actual pincode from the form
+        email: data.email,
+        address: data.address,
+        pincode: data.pincode,
         login_password: "tscl@123",
         verification_status: "active",
         user_status: "active",
       };
-
+  
       let public_user_id;
-      // Assuming some logic to get the public user ID (from autoFillData or elsewhere)
       if (autoFillData) {
         public_user_id = autoFillData.public_user_id;
       } else {
         const response = await axios.post(`${API}/public-user/post`, userInfo);
         public_user_id = decryptData(response.data.data);
       }
-
+  
       const grievanceDetails = {
         grievance_mode: "website",
-        complaint_type_title: data.complaint_type_title, // Use the actual data from the form
-        dept_name: data.dept_name, // Use the actual department from the form
-        zone_name: data.zone_name, // Use the actual zone from the form
-        ward_name: data.ward_name, // Use the actual ward from the form
-        street_name: data.street_name, // Use the actual street from the form
-        pincode: data.pincode, // Use the actual pincode from the form
-        complaint: data.complaint, // Use the actual complaint from the form
-        complaint_details: data.complaint_details, // Use the actual complaint details from the form
+        complaint_type_title: data.complaint_type_title,
+        dept_name: data.dept_name,
+        zone_name: data.zone_name,
+        ward_name: data.ward_name,
+        street_name: data.street_name,
+        pincode: data.pincode,
+        complaint: data.complaint,
+        complaint_details: data.complaint_details,
         public_user_id: public_user_id,
-        public_user_name: data.public_user_name, // Use the actual user name from the form
+        public_user_name: data.public_user_name,
         phone: PhoneNo,
         status: "new",
         statusflow: "new",
       };
-
+  
       // Submit grievance data
-      const response1 = await axios.post(`${API}/new-grievance/postguest`, grievanceDetails);
+      const response1 = await axios.post(
+        `${API}/new-grievance/postguest`,
+        grievanceDetails
+      );
       const grievanceId = await response1.data.data;
-      console.log(grievanceDetails);
-      
-      console.log(grievanceId);
-
+  
       if (response1.status === 200) {
         toast.success("Grievance created successfully!");
-
+  
+  
         // Handle attachments if any
         if (files.length > 0) {
           if (files.length > 5) {
@@ -337,25 +343,30 @@ const Guestform = ({ language }) => {
             }
             formData.append("grievance_id", grievanceId);
             formData.append("created_by_user", "admin");
-
+  
             const response3 = await axios.post(
               `${API}/new-grievance-attachment/post`,
               formData,
               { headers: { "Content-Type": "multipart/form-data" } }
             );
-
+  
             if (response3.status === 200) {
               setFiles([]);
               toast.success("Attachment created successfully!");
             }
           }
         }
-
+  
         // Reset after submission
         setPhone(""); // Clear the phone number input
         setOtp(""); // Clear the OTP input
-        back()
+        back();
+        if (window.recaptchaVerifier) {
+          window.recaptchaVerifier.clear(); 
+          delete window.recaptchaVerifier;
+        }
         reset();
+        
       }
     } catch (error) {
       setLoading(false);
@@ -363,7 +374,7 @@ const Guestform = ({ language }) => {
       toast.error("OTP verification failed. Please try again.");
     }
   };
-  
+
   // Function to initialize reCAPTCHA
   function onCaptchVerify() {
     if (!window.recaptchaVerifier) {
@@ -382,12 +393,10 @@ const Guestform = ({ language }) => {
       );
     }
   }
-  
-  // Function to initialize reCAPTCHA
- 
-  
 
-  const handleResendOtp = async () => {};
+  // Function to initialize reCAPTCHA
+
+
 
   const formatTime = (time) => {};
 
@@ -800,9 +809,9 @@ const Guestform = ({ language }) => {
                 />
               </div>
             </div>
-            <div className="flex justify-evenly">
+            <div className="flex justify-center">
               <button
-               onClick={() => onVerifyOTP(watch())}
+                onClick={() => onVerifyOTP(watch())}
                 className="border w-fit p-2 flex justify-center rounded-lg bg-blue-500 text-white font-semibold my-4 items-center px-2"
               >
                 {loading && (
@@ -810,13 +819,7 @@ const Guestform = ({ language }) => {
                 )}
                 Verify Otp
               </button>{" "}
-              <button
-                onClick={() => canResend && handleResendOtp()}
-                className="border w-fit p-2 flex justify-center rounded-lg bg-blue-500 text-white font-semibold my-4 items-center px-2"
-              >
-                Resend Otp
-                <p className="text-lg font-extralight ">{formatTime(timer)}</p>
-              </button>
+             
             </div>
           </div>
         </div>
