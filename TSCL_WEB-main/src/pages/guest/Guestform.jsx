@@ -12,6 +12,8 @@ import decryptData from "../../Decrypt";
 import { useSelector } from "react-redux";
 import OtpInput from "otp-input-react";
 import { CgSpinner } from "react-icons/cg";
+import Logo from "../../assets/images/logo1.png";
+import { AiOutlineLoading } from "react-icons/ai";
 
 const UserInfoSchema = yup.object().shape({
   public_user_name: yup.string().required("Name is required"),
@@ -38,6 +40,7 @@ const GrievanceDetailsSchema = yup.object().shape({
     .matches(/^[0-9]{6}$/, "Pincode must be 6 digits"),
   complaint: yup.string().required("Complaint Type is required"),
   complaint_details: yup.string().required("Description is required"),
+  complaintaddress: yup.string().required("Complaint Address is required"),
 });
 
 const CombinedSchema = yup
@@ -104,6 +107,7 @@ const Guestform = ({ language }) => {
         setValue("phone", autoFillData.phone);
         setValue("email", autoFillData.email);
         setValue("address", autoFillData.address);
+        setValue("complaintaddress", autoFillData.address);
         setValue("pincode", autoFillData.pincode);
         setAutoFillData(autoFillData);
       } catch (error) {
@@ -277,13 +281,13 @@ const Guestform = ({ language }) => {
   // Function to verify OTP and submit data
   const onVerifyOTP = async (data) => {
     setLoading(true);
-  
+
     try {
       // Verify OTP
       const result = await window.confirmationResult.confirm(otp);
       console.log("OTP Verified:", result);
       toast.success("OTP verified successfully!");
-  
+
       // Prepare the data to be sent after OTP verification
       const userInfo = {
         public_user_name: data.public_user_name,
@@ -295,7 +299,7 @@ const Guestform = ({ language }) => {
         verification_status: "active",
         user_status: "active",
       };
-  
+
       let public_user_id;
       if (autoFillData) {
         public_user_id = autoFillData.public_user_id;
@@ -303,9 +307,9 @@ const Guestform = ({ language }) => {
         const response = await axios.post(`${API}/public-user/post`, userInfo);
         public_user_id = decryptData(response.data.data);
       }
-  
+
       const grievanceDetails = {
-        grievance_mode: "website",
+        grievance_mode: "whatsapp",
         complaint_type_title: data.complaint_type_title,
         dept_name: data.dept_name,
         zone_name: data.zone_name,
@@ -313,6 +317,7 @@ const Guestform = ({ language }) => {
         street_name: data.street_name,
         pincode: data.pincode,
         complaint: data.complaint,
+        complaintaddress: data.complaintaddress,
         complaint_details: data.complaint_details,
         public_user_id: public_user_id,
         public_user_name: data.public_user_name,
@@ -320,18 +325,19 @@ const Guestform = ({ language }) => {
         status: "new",
         statusflow: "new",
       };
-  
+
       // Submit grievance data
       const response1 = await axios.post(
         `${API}/new-grievance/postguest`,
         grievanceDetails
       );
       const grievanceId = await response1.data.data;
-  
+
       if (response1.status === 200) {
         toast.success("Grievance created successfully!");
-  
-  
+        console.log(grievanceDetails);
+        console.log(userInfo);
+
         // Handle attachments if any
         if (files.length > 0) {
           if (files.length > 5) {
@@ -343,30 +349,27 @@ const Guestform = ({ language }) => {
             }
             formData.append("grievance_id", grievanceId);
             formData.append("created_by_user", "admin");
-  
             const response3 = await axios.post(
               `${API}/new-grievance-attachment/post`,
               formData,
               { headers: { "Content-Type": "multipart/form-data" } }
             );
-  
             if (response3.status === 200) {
               setFiles([]);
               toast.success("Attachment created successfully!");
             }
           }
         }
-  
+
         // Reset after submission
         setPhone(""); // Clear the phone number input
         setOtp(""); // Clear the OTP input
         back();
         if (window.recaptchaVerifier) {
-          window.recaptchaVerifier.clear(); 
+          window.recaptchaVerifier.clear();
           delete window.recaptchaVerifier;
         }
         reset();
-        
       }
     } catch (error) {
       setLoading(false);
@@ -396,8 +399,6 @@ const Guestform = ({ language }) => {
 
   // Function to initialize reCAPTCHA
 
-
-
   const formatTime = (time) => {};
 
   useEffect(() => {
@@ -417,289 +418,318 @@ const Guestform = ({ language }) => {
   };
 
   return (
-    <div className="bg-blue-600 h-full overflow-auto">
-      <div className="m-6 overflow-auto no-scrollbar space-y-8">
-        <div className="py-2">
-          <p className="font-semibold flex justify-between items-center py-2 text-white text-2xl font-roboto">
-            <span> {translations.en.grievance_form} </span>
-            {/* <div className="flex gap-3 border  items-center px-2.5 rounded-lg"
-            onClick={back}>
-              <IoArrowBackOutline />
-              <p>Back</p>
-            </div> */}
-          </p>
-          <div className="bg-white mt-3 rounded-lg pb-2">
-            <div className="border-2 rounded-lg">
-              <p className="font-lexend text-xl p-4">Complaint Details</p>
-            </div>
+    <div className="h-full overflow-auto">
+      <div className="p-3 bg-blue-500 overflow-auto no-scrollbar space-y-8">
+        <div className="bg-white rounded-xl">
+          <div className=" pt-2  pl-10 sm:pl-0 flex justify-center items-center gap-2">
+            <img src={Logo} alt="MMC" className="w-20" />
+            <p className="font-sans text-2xl font-medium drop-shadow-xl text-blue-700">
+              Madurai Municipal Corporation
+            </p>
+          </div>
+          <div className="  p-3 rounded-lg py-2">
+            <p className="border-l-8 border-blue-600 font-semibold font-sans  text-3xl p-2">
+              Complaint Form
+            </p>
 
             <form onSubmit={handleSubmit(onSubmitWithOTP)}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-5 mx-10">
-                <div className="flex flex-col">
-                  <label
-                    className="block text-black text-lg font-medium mb-2"
-                    htmlFor="phone"
-                  >
-                    {translations.en.contact_number}
-                  </label>
-                  <input
-                    type="text"
-                    id="phone"
-                    onChange={(e) => setPhone(e.target.value)} // Ensure to set the phone correctly
-                    className="w-full text-start border-2 rounded-lg px-2 py-2 outline-none"
-                    placeholder="Enter the Contact number"
-                    {...register("phone")}
-                  />
-                  {errors.phone && (
-                    <p className="text-red-500 text-xs text-start pt-2">
-                      {errors.phone.message ||
-                        "Please enter a valid phone number"}
-                    </p>
-                  )}
+              <div className="grid grid-cols-12 gap-4 my-5 mx-2 ">
+                <div className="lg:col-span-6  md:col-span-6 col-span-12 gap-3 space-y-3 ">
+                  <div className="flex flex-col ">
+                    <label
+                      className="block text-black text-lg font-medium mb-2"
+                      htmlFor="phone"
+                    >
+                      {translations.en.contact_number}
+                    </label>
+                    <input
+                      type="text"
+                      id="phone"
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="w-full text-start border-black border rounded-lg px-2 py-2 outline-none"
+                      placeholder="Enter the Contact number"
+                      {...register("phone")}
+                    />
+                    {errors.phone && (
+                      <p className="text-red-500 text-xs text-start pt-2">
+                        {errors.phone.message ||
+                          "Please enter a valid phone number"}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col  ">
+                    <label
+                      className="block text-black text-lg font-medium mb-2"
+                      htmlFor="public_user_name"
+                    >
+                      {translations.en.name}
+                    </label>
+                    <input
+                      type="text"
+                      id="public_user_name"
+                      className="w-full text-start border-black border rounded-lg px-2 py-2 outline-none"
+                      placeholder="Enter your Name"
+                      {...register("public_user_name")}
+                      defaultValue={
+                        autoFillData ? autoFillData.public_user_name : ""
+                      }
+                    />
+                    {errors.public_user_name && (
+                      <p className="text-red-500 text-xs text-start pt-2">
+                        {errors.public_user_name.message}
+                      </p>
+                    )}
+                  </div>
                 </div>
 
-                <div className="flex flex-col">
-                  <label
-                    className="block text-black text-lg font-medium mb-2"
-                    htmlFor="public_user_name"
-                  >
-                    {translations.en.name}
-                  </label>
-                  <input
-                    type="text"
-                    id="public_user_name"
-                    className="w-full text-start border-2 rounded-lg px-2 py-2 outline-none"
-                    placeholder="Enter your Name"
-                    {...register("public_user_name")}
-                    defaultValue={
-                      autoFillData ? autoFillData.public_user_name : ""
-                    }
-                  />
-                  {errors.public_user_name && (
-                    <p className="text-red-500 text-xs text-start pt-2">
-                      {errors.public_user_name.message}
-                    </p>
-                  )}
+                <div className="lg:col-span-6  md:col-span-6 col-span-12 gap-3 space-y-3">
+                  <div className="flex flex-col  ">
+                    <label
+                      className="block text-black text-lg font-medium mb-2"
+                      htmlFor="email"
+                    >
+                      {translations.en.email_id}
+                    </label>
+                    <input
+                      type="email"
+                      id="email"
+                      className="w-full text-start border-black border rounded-lg px-2 py-2 outline-none"
+                      placeholder="abc@gmail.com"
+                      {...register("email")}
+                      defaultValue={autoFillData ? autoFillData.email : ""}
+                    />
+                    {errors.email && (
+                      <p className="text-red-500 text-xs text-start pt-2">
+                        {errors.email.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col  ">
+                    <label
+                      className="block text-black text-lg font-medium mb-2"
+                      htmlFor="address"
+                    >
+                      {translations.en.address}
+                    </label>
+                    <input
+                      type="text"
+                      id="address"
+                      className="w-full text-start border-black border rounded-lg px-2 py-2 outline-none"
+                      placeholder="Enter your Address"
+                      {...register("address")}
+                      defaultValue={autoFillData ? autoFillData.address : ""}
+                    />
+                    {errors.address && (
+                      <p className="text-red-500 text-xs text-start pt-2">
+                        {errors.address.message}
+                      </p>
+                    )}
+                  </div>
                 </div>
 
-                <div className="flex flex-col">
-                  <label
-                    className="block text-black text-lg font-medium mb-2"
-                    htmlFor="email"
-                  >
-                    {translations.en.email_id}
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    className="w-full text-start border-2 rounded-lg px-2 py-2 outline-none"
-                    placeholder="abc@gmail.com"
-                    {...register("email")}
-                    defaultValue={autoFillData ? autoFillData.email : ""}
-                  />
-                  {errors.email && (
-                    <p className="text-red-500 text-xs text-start pt-2">
-                      {errors.email.message}
-                    </p>
-                  )}
+              </div>
+
+              <div className="grid grid-cols-12 gap-4 my-5 mx-2">
+                <div className="md:col-span-6 lg:col-span-6 col-span-12 space-y-4">
+                  <div className="flex flex-col ">
+                    <label
+                      className="block text-black text-lg font-medium mb-2"
+                      htmlFor="complaint_type_title"
+                    >
+                      Complaint Type:
+                    </label>
+                    <input
+                      className="block w-full px-4 py-3 text-sm text-black border-black border rounded-lg bg-gray-50 hover:border-gray-200 outline-none"
+                      defaultValue="Individual"
+                      placeholder="Individual"
+                      {...register("complaint_type_title")}
+                    />
+                    {errors.complaint_type_title && (
+                      <p className="text-red-500 text-xs text-start pt-2">
+                        {errors.complaint_type_title.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col">
+                    <label
+                      className="block text-black text-lg font-medium mb-2"
+                      htmlFor="dept_name"
+                    >
+                      Department:
+                    </label>
+                    <select
+                      className="block w-full px-4 py-3 text-sm text-black border-black border rounded-lg outline-none"
+                      defaultValue=""
+                      {...register("dept_name")}
+                    >
+                      <option value="" disabled>
+                        Select a Department
+                      </option>
+                      {department &&
+                        department.map((option) => (
+                          <option key={option.dept_id} value={option.dept_name}>
+                            {option.dept_name}
+                          </option>
+                        ))}
+                    </select>
+                    {errors.dept_name && (
+                      <p className="text-red-500 text-xs text-start pt-2">
+                        {errors.dept_name.message}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex flex-col">
+                    <label
+                      className="block text-black text-lg font-medium mb-2"
+                      htmlFor="complaint"
+                    >
+                      Complaint:
+                    </label>
+                    <select
+                      className="block w-full px-4 py-3 text-sm text-black border-black border rounded-lg  outline-none"
+                      defaultValue=""
+                      {...register("complaint")}
+                    >
+                      <option value="" disabled>
+                        Select a Complaint
+                      </option>
+                      {complaint &&
+                        complaint.map((option) => (
+                          <option
+                            key={option.complaint_id}
+                            value={option.complaint_type_title}
+                          >
+                            {option.complaint_type_title}
+                          </option>
+                        ))}
+                    </select>
+                    {errors.complaint && (
+                      <p className="text-red-500 text-xs text-start pt-2">
+                        {errors.complaint.message}
+                      </p>
+                    )}
+                  </div>
                 </div>
 
-                <div className="flex flex-col">
-                  <label
-                    className="block text-black text-lg font-medium mb-2"
-                    htmlFor="address"
-                  >
-                    {translations.en.address}
-                  </label>
-                  <input
-                    type="text"
-                    id="address"
-                    className="w-full text-start border-2 rounded-lg px-2 py-2 outline-none"
-                    placeholder="Enter your Address"
-                    {...register("address")}
-                    defaultValue={autoFillData ? autoFillData.address : ""}
-                  />
-                  {errors.address && (
-                    <p className="text-red-500 text-xs text-start pt-2">
-                      {errors.address.message}
-                    </p>
-                  )}
+                <div className="md:col-span-6 lg:col-span-6 col-span-12 space-y-4">
+                  {" "}
+                  <div className="flex flex-col ">
+                    <label
+                      className="block text-black text-lg font-medium mb-2"
+                      htmlFor="zone_name"
+                    >
+                      Zone:
+                    </label>
+                    <select
+                      className="block w-full px-4 py-3 text-sm text-black border-black border rounded-lg  outline-none"
+                      defaultValue=""
+                      {...register("zone_name")}
+                    >
+                      <option value="" disabled>
+                        Select a Zone
+                      </option>
+                      {zone &&
+                        zone.map((option) => (
+                          <option key={option.zone_id} value={option.zone_name}>
+                            {option.zone_name}
+                          </option>
+                        ))}
+                    </select>
+                    {errors.zone_name && (
+                      <p className="text-red-500 text-xs text-start pt-2">
+                        {errors.zone_name.message}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex flex-col">
+                    <label
+                      className="block text-black text-lg font-medium mb-2"
+                      htmlFor="ward_name"
+                    >
+                      Ward:
+                    </label>
+                    <select
+                      className="block w-full px-4 py-3 text-sm text-black border-black border rounded-lg  outline-none"
+                      defaultValue=""
+                      {...register("ward_name")}
+                    >
+                      <option value="" disabled>
+                        Select a Ward
+                      </option>
+                      {Ward &&
+                        Ward.map((option) => (
+                          <option key={option.ward_id} value={option.ward_name}>
+                            {option.ward_name}
+                          </option>
+                        ))}
+                    </select>
+                    {errors.ward_name && (
+                      <p className="text-red-500 text-xs text-start pt-2">
+                        {errors.ward_name.message}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex flex-col">
+                    <label
+                      className="block text-black text-lg font-medium mb-2"
+                      htmlFor="street_name"
+                    >
+                      Street:
+                    </label>
+                    <select
+                      className="block w-full px-4 py-3 text-sm text-black border-black border  rounded-lg  outline-none"
+                      defaultValue=""
+                      {...register("street_name")}
+                    >
+                      <option value="" disabled>
+                        Select a Street
+                      </option>
+                      {street &&
+                        street.map((option) => (
+                          <option
+                            key={option.street_id}
+                            value={option.street_name}
+                          >
+                            {option.street_name}
+                          </option>
+                        ))}
+                    </select>
+                    {errors.street_name && (
+                      <p className="text-red-500 text-xs text-start pt-2">
+                        {errors.street_name.message}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-5 mx-10">
-                <div className="flex flex-col">
+              <div className="grid grid-cols-12 gap-4 mx-3  ">
+                <div className="flex flex-col md:col-span-6 col-span-12 ">
                   <label
                     className="block text-black text-lg font-medium mb-2"
-                    htmlFor="complaint_type_title"
+                    htmlFor="complaintaddress"
                   >
-                    Complaint Type:
+                    Complaint Address:
                   </label>
                   <input
-                    className="block w-full px-4 py-3 text-sm text-black border border-gray-200 rounded-lg bg-gray-50 hover:border-gray-200 outline-none"
-                    defaultValue="Individual"
-                    placeholder="Individual"
-                    {...register("complaint_type_title")}
+                    type="text"
+                    id="complaintaddress"
+                    className="w-full text-start border-black border rounded-lg px-2 py-2 outline-none"
+                    placeholder="Enter your Complaint Address"
+                    {...register("complaintaddress")}
+                    defaultValue={autoFillData ? autoFillData.complaintaddress : ""}
                   />
-                  {errors.complaint_type_title && (
+                  {errors.complaintaddress && (
                     <p className="text-red-500 text-xs text-start pt-2">
-                      {errors.complaint_type_title.message}
+                      {errors.complaintaddress.message}
                     </p>
                   )}
                 </div>
 
-                <div className="flex flex-col">
-                  <label
-                    className="block text-black text-lg font-medium mb-2"
-                    htmlFor="zone_name"
-                  >
-                    Zone:
-                  </label>
-                  <select
-                    className="block w-full px-4 py-3 text-sm text-black border border-gray-200 rounded-lg bg-gray-50 hover:border-gray-200 outline-none"
-                    defaultValue=""
-                    {...register("zone_name")}
-                  >
-                    <option value="" disabled>
-                      Select a Zone
-                    </option>
-                    {zone &&
-                      zone.map((option) => (
-                        <option key={option.zone_id} value={option.zone_name}>
-                          {option.zone_name}
-                        </option>
-                      ))}
-                  </select>
-                  {errors.zone_name && (
-                    <p className="text-red-500 text-xs text-start pt-2">
-                      {errors.zone_name.message}
-                    </p>
-                  )}
-                </div>
-
-                <div className="flex flex-col">
-                  <label
-                    className="block text-black text-lg font-medium mb-2"
-                    htmlFor="dept_name"
-                  >
-                    Department:
-                  </label>
-                  <select
-                    className="block w-full px-4 py-3 text-sm text-black border border-gray-200 rounded-lg bg-gray-50 hover:border-gray-200 outline-none"
-                    defaultValue=""
-                    {...register("dept_name")}
-                  >
-                    <option value="" disabled>
-                      Select a Department
-                    </option>
-                    {department &&
-                      department.map((option) => (
-                        <option key={option.dept_id} value={option.dept_name}>
-                          {option.dept_name}
-                        </option>
-                      ))}
-                  </select>
-                  {errors.dept_name && (
-                    <p className="text-red-500 text-xs text-start pt-2">
-                      {errors.dept_name.message}
-                    </p>
-                  )}
-                </div>
-
-                <div className="flex flex-col">
-                  <label
-                    className="block text-black text-lg font-medium mb-2"
-                    htmlFor="ward_name"
-                  >
-                    Ward:
-                  </label>
-                  <select
-                    className="block w-full px-4 py-3 text-sm text-black border border-gray-200 rounded-lg bg-gray-50 hover:border-gray-200 outline-none"
-                    defaultValue=""
-                    {...register("ward_name")}
-                  >
-                    <option value="" disabled>
-                      Select a Ward
-                    </option>
-                    {Ward &&
-                      Ward.map((option) => (
-                        <option key={option.ward_id} value={option.ward_name}>
-                          {option.ward_name}
-                        </option>
-                      ))}
-                  </select>
-                  {errors.ward_name && (
-                    <p className="text-red-500 text-xs text-start pt-2">
-                      {errors.ward_name.message}
-                    </p>
-                  )}
-                </div>
-
-                <div className="flex flex-col">
-                  <label
-                    className="block text-black text-lg font-medium mb-2"
-                    htmlFor="complaint"
-                  >
-                    Complaint:
-                  </label>
-                  <select
-                    className="block w-full px-4 py-3 text-sm text-black border border-gray-200 rounded-lg bg-gray-50 hover:border-gray-200 outline-none"
-                    defaultValue=""
-                    {...register("complaint")}
-                  >
-                    <option value="" disabled>
-                      Select a Complaint
-                    </option>
-                    {complaint &&
-                      complaint.map((option) => (
-                        <option
-                          key={option.complaint_id}
-                          value={option.complaint_type_title}
-                        >
-                          {option.complaint_type_title}
-                        </option>
-                      ))}
-                  </select>
-                  {errors.complaint && (
-                    <p className="text-red-500 text-xs text-start pt-2">
-                      {errors.complaint.message}
-                    </p>
-                  )}
-                </div>
-
-                <div className="flex flex-col">
-                  <label
-                    className="block text-black text-lg font-medium mb-2"
-                    htmlFor="street_name"
-                  >
-                    Street:
-                  </label>
-                  <select
-                    className="block w-full px-4 py-3 text-sm text-black border border-gray-200 rounded-lg bg-gray-50 hover:border-gray-200 outline-none"
-                    defaultValue=""
-                    {...register("street_name")}
-                  >
-                    <option value="" disabled>
-                      Select a Street
-                    </option>
-                    {street &&
-                      street.map((option) => (
-                        <option
-                          key={option.street_id}
-                          value={option.street_name}
-                        >
-                          {option.street_name}
-                        </option>
-                      ))}
-                  </select>
-                  {errors.street_name && (
-                    <p className="text-red-500 text-xs text-start pt-2">
-                      {errors.street_name.message}
-                    </p>
-                  )}
-                </div>
-
-                <div className="flex flex-col">
+                <div className="flex flex-col md:col-span-6 col-span-12">
                   <label
                     className="block text-black text-lg font-medium mb-2"
                     htmlFor="pincode"
@@ -709,7 +739,7 @@ const Guestform = ({ language }) => {
                   <input
                     type="text"
                     id="pincode"
-                    className="w-full text-start border-2 rounded-lg px-2 py-2 outline-none"
+                    className="w-full text-start border-black border rounded-lg px-2 py-2 outline-none"
                     placeholder="Pincode"
                     {...register("pincode")}
                     defaultValue={autoFillData ? autoFillData.pincode : ""}
@@ -720,16 +750,35 @@ const Guestform = ({ language }) => {
                     </p>
                   )}
                 </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-5 mx-10">
-                  <div className="flex flex-col">
+                <div className="flex flex-col md:col-span-6 col-span-12">
+                  <label
+                    className="block text-black text-lg font-medium mb-2"
+                    htmlFor="complaint_details"
+                  >
+                    Description:
+                  </label>
+                  <textarea
+                    id="complaint_details"
+                    rows="5"
+                    className="block py-2.5 pl-3 w-full text-sm text-gray-900 rounded border-black border  focus:outline-none focus:shadow-outline mb-2"
+                    placeholder="Description here..."
+                    {...register("complaint_details")}
+                  ></textarea>
+                  {errors.complaint_details && (
+                    <p className="text-red-500 text-xs text-start px-2 ">
+                      {errors.complaint_details.message}
+                    </p>
+                  )}
+                </div>
+                <div className="gap-4 sm:flex items-center my-5 mx-5 md:col-span-6 col-span-12">
+                  <div className="flex flex-col col-span-4">
                     <label
                       className="block text-black text-lg font-medium mb-2"
                       htmlFor="file"
                     >
                       Attachment:{" "}
                       <p className="text-xs ">
-                        (optional / <br /> up to 5 files allowed)
+                        (optional / up to 5 files allowed)
                       </p>
                     </label>
                   </div>
@@ -749,37 +798,19 @@ const Guestform = ({ language }) => {
                     )}
                   </div>
                 </div>
-
-                <div className="flex flex-col">
-                  <label
-                    className="block text-black text-lg font-medium mb-2"
-                    htmlFor="complaint_details"
-                  >
-                    Description:
-                  </label>
-                  <textarea
-                    id="complaint_details"
-                    rows="5"
-                    className="block py-2.5 pl-3 w-full text-sm text-gray-900 rounded border border-gray-300 focus:outline-none focus:shadow-outline mb-2"
-                    placeholder="Description here..."
-                    {...register("complaint_details")}
-                  ></textarea>
-                  {errors.complaint_details && (
-                    <p className="text-red-500 text-xs text-start px-2 ">
-                      {errors.complaint_details.message}
-                    </p>
-                  )}
-                </div>
               </div>
-              <div className=" text-center my-3 flex justify-center">
+
+              <div className=" text-center my-6 flex justify-center">
                 <button
                   type="submit"
-                  className="bg-blue-500 w-fit rounded-lg text-white px-4 text-xl py-2 flex gap-2 justify-center items-center"
+                  className={`w-fit rounded-lg border-2 font-medium border-blue-500 text-blue-500  px-4 text-xl py-2 flex gap-4 justify-center items-center ${
+                    loading ? "opacity-50 cursor-not-allowed" : ""
+                  } `}
                 >
-                  {loading && (
-                    <CgSpinner className="text-5xl px-3 items-center animate-spin my-1" />
-                  )}{" "}
-                  Submit
+                  {loading ? (<>
+                    <CgSpinner className="h-6 w-6 items-center animate-spin my-1" />
+                    <p>Submiting...</p></>
+                  ):(<p>Submit</p>)}{" "}
                 </button>
               </div>
             </form>
@@ -788,16 +819,16 @@ const Guestform = ({ language }) => {
       </div>
       {showOTP && (
         <div className="fixed inset-0 bg-black bg-opacity-25 backdrop-blur-sm flex  justify-center items-center">
-          <div className="bg-white w-fit h-fit rounded-md font-lexend m-2 mx-5 overflow-auto">
+          <div className="bg-white sm:w-fit w-[380px] h-fit rounded-md font-lexend m-2 mx-5 overflow-auto">
             <div className="flex justify-between mx-3 mt-2 items-center">
               <p className="pt-2 text-lg text-slate-900 pl-5">Verify Otp</p>
               <p className="text-3xl pr-5" onClick={() => setShowOTP(!showOTP)}>
                 x
               </p>
             </div>
-            <hr className="my-3 w-full" />
+            <hr className=" w-full" />
             <div className="flex justify-center items-center flex-col">
-              <div className=" flex m-10 justify-center items-center gap-4">
+              <div className=" flex m-10 justify-center items-center ">
                 <OtpInput
                   value={otp}
                   onChange={setOtp}
@@ -812,14 +843,15 @@ const Guestform = ({ language }) => {
             <div className="flex justify-center">
               <button
                 onClick={() => onVerifyOTP(watch())}
-                className="border w-fit p-2 flex justify-center rounded-lg bg-blue-500 text-white font-semibold my-4 items-center px-2"
+                className={`border w-fit p-2 gap-2 flex justify-center rounded-lg border-blue-500 text-blue-500 font-semibold my-4 items-center px-2 ${
+                  loading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               >
-                {loading && (
-                  <CgSpinner className="text-5xl px-3 items-center animate-spin my-1" />
-                )}
-                Verify Otp
-              </button>{" "}
-             
+               {loading ? (<>
+                    <CgSpinner className="h-6 w-6 items-center animate-spin my-1" />
+                    <p>Verifying...</p></>
+                  ):(<p>Verify OTP</p>)}
+              </button>
             </div>
           </div>
         </div>

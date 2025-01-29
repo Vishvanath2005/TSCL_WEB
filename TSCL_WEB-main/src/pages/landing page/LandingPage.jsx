@@ -215,7 +215,7 @@ const LandingPage = () => {
                     href="https://portal.maduraismartcity.com/"
                     className="lg:px-8 md:px-8 px-1.5 lg:py-8 md:py-8 py-1.5 flex flex-col items-center justify-center gap-1 bg-[#E6D590] rounded-lg lg:h-full md:h-full  h-28"
                   >
-                    <button className=" flex-col flex justify-center items-center space-y-1">
+                    <button className=" flex-col flex justify-center items-center space-y-1 w-[69px] md:w-24">
                       <div className="bg-[#21409A] rounded-full w-fit lg:px-4 md:px-4 px-2 lg:py-4 md:py-4 py-2 ">
                         <FiFile className="lg:size-6 md:size-6 size-4  text-[#E6D590]" />
                       </div>
