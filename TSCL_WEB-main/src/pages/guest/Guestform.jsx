@@ -335,8 +335,8 @@ const Guestform = ({ language }) => {
 
       if (response1.status === 200) {
         toast.success("Grievance created successfully!");
-        console.log(grievanceDetails);
-        console.log(userInfo);
+        // console.log(grievanceDetails);
+        // console.log(userInfo);
 
         // Handle attachments if any
         if (files.length > 0) {
