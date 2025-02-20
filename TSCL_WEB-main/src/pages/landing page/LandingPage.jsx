@@ -8,14 +8,16 @@ import { BsGlobe } from "react-icons/bs";
 import ContactUs from "./ContactUs";
 import Terms from "./Terms";
 import PrivacyPolicy from "./PrivacyPolicy";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import GrievancesForm from "../grievances/GrievancesForm";
 import Guestform from "../guest/Guestform";
 
 const LandingPage = () => {
   const [language, setLanguage] = useState("en");
   const [activeLink, setActiveLink] = useState("");
+  const [isActive, setIsActive] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const savedLanguage = localStorage.getItem("language");
@@ -35,6 +37,7 @@ const LandingPage = () => {
       title: "Madurai Municipal Corporation",
       home: "Home",
       dashboard: "Dashboard",
+      login: "Login",
       contactUs: "Contact Us",
       grievance: "Track Grievance",
       fileGrievance: "File a Grievance",
@@ -69,12 +72,14 @@ const LandingPage = () => {
       privacy: "Privacy Policy",
       contactUs: "Contact us",
       aboutUs: "About us",
-      rightsReserved: "All rights reserved © Madurai Municipal Corporation 2025",
+      rightsReserved:
+        "All rights reserved © Madurai Municipal Corporation 2025",
     },
     ta: {
       title: "மதுரை ஸ்மார்ட் சிட்டி",
       home: "முகப்பு",
       dashboard: "டாஷ்போர்டு",
+      login: "உள்நுழைவு",
       contactUs: "தொடர்பு கொள்ளவும்",
       grievance: "புகார் நிலையை பின்தொடர்க",
       fileGrievance: "புகார் பதிவு செய்யவும்",
@@ -143,7 +148,9 @@ const LandingPage = () => {
                 href=""
                 onClick={() => handleLinkClick("")}
                 className={`lg:px-6 md:px-6 px-2 py-2 rounded-md ${
-                  activeLink === "" ? "text-white bg-[#21409A]" : "text-black border"
+                  activeLink === ""
+                    ? "text-white bg-[#21409A]"
+                    : "text-black border"
                 }`}
               >
                 {translations[language].home}
@@ -161,7 +168,7 @@ const LandingPage = () => {
               </a> */}
               <a
                 onClick={() => handleLinkClick("/contactus")}
-                className={`md:px-6 px-2 text-wrap py-2 rounded-lg ${
+                className={`md:px-6 px-2 text-wrap py-2 rounded-lg  ${
                   activeLink === "/contactus"
                     ? "text-white bg-[#21409A]"
                     : "text-black border"
@@ -169,6 +176,12 @@ const LandingPage = () => {
               >
                 {translations[language].contactUs}
               </a>
+
+              <button
+              onClick={login}
+              className={`px-4 py-2 rounded-md text-blue-600 text-xl`}>
+                <u>{translations[language].login}</u>
+              </button>
               <div className="flex items-center gap-2">
                 <BsGlobe />
                 <select
@@ -206,7 +219,7 @@ const LandingPage = () => {
                     onClick={() => navigate("/whatsappcomplaints")}
                     className="lg:px-8 md:px-8 px-1.5 lg:py-8 md:py-8 py-1.5 flex flex-col items-center justify-center gap-1 bg-[#E6D590] rounded-lg lg:h-full md:h-full  h-28"
                   >
-                    <div  className="bg-[#21409A] rounded-full lg:px-4 md:px-4 px-2 lg:py-4 md:py-4 py-2 ">
+                    <div className="bg-[#21409A] rounded-full lg:px-4 md:px-4 px-2 lg:py-4 md:py-4 py-2 ">
                       <GrLogin className="lg:size-6 md:size-6 size-4 text-[#E6D590] " />
                     </div>
                     <p>{translations[language].fileGrievance}</p>
@@ -343,52 +356,53 @@ const LandingPage = () => {
           </main>
         )}
       </div>
-      <footer className="mt-12   text-white bg-[#21409A] font-roboto ">
-        <div className=" py-6 mx-3  space-y-4">
-          <div className=" grid grid-cols-2  mx-8 ">
-            <div className="sm:col-span-1 col-span-2">
-              <p>Phone: 9585912344</p>
-              <p>
-                E-Mail:{" "}
-                <a href="info@maduraismartcity.com">
-                  info@maduraismartcity.com
-                </a>
-              </p>
-              <p className="flex flex-col">
-                <span>Address: 1255, Madurai Corporation Building,</span>
-                <span>
-                  {" "}
-                  Melur Road, Tallakulam, Madurai, Tamil Nadu, 625020.
-                </span>
-              </p>
+      
+        <footer className="mt-12   text-white bg-[#21409A] font-roboto ">
+          <div className=" py-6 mx-3  space-y-4">
+            <div className=" grid grid-cols-2  mx-8 ">
+              <div className="sm:col-span-1 col-span-2">
+                <p>Phone: 9585912344</p>
+                <p>
+                  E-Mail:{" "}
+                  <a href="info@maduraismartcity.com">
+                    info@maduraismartcity.com
+                  </a>
+                </p>
+                <p className="flex flex-col">
+                  <span>Address: 1255, Madurai Corporation Building,</span>
+                  <span>
+                    {" "}
+                    Melur Road, Tallakulam, Madurai, Tamil Nadu, 625020.
+                  </span>
+                </p>
+              </div>
+              <nav className="sm:items-end items-start sm:col-span-1 col-span-2 flex flex-col  justify-end text-end font-normal text-sm text-[#D9D9D9] py-4 gap-2">
+                <button
+                  onClick={() => handleLinkClick("/terms")}
+                  className="text-left hover:underline"
+                >
+                  {translations[language]?.terms || "Terms and Conditions"}
+                </button>
+                <button
+                  onClick={() => handleLinkClick("/privacy")}
+                  className="text-left hover:underline"
+                >
+                  {translations[language].privacy}
+                </button>
+                <button
+                  onClick={() => handleLinkClick("/contactus")}
+                  className="text-left hover:underline"
+                >
+                  {translations[language].contactUs}
+                </button>
+              </nav>
             </div>
-            <nav className="sm:items-end items-start sm:col-span-1 col-span-2 flex flex-col  justify-end text-end font-normal text-sm text-[#D9D9D9] py-4 gap-2">
-              <button
-                onClick={() => handleLinkClick("/terms")}
-                className="text-left hover:underline"
-              >
-                {translations[language]?.terms || "Terms and Conditions"}
-              </button>
-              <button
-                onClick={() => handleLinkClick("/privacy")}
-                className="text-left hover:underline"
-              >
-                {translations[language].privacy}
-              </button>
-              <button
-                onClick={() => handleLinkClick("/contactus")}
-                className="text-left hover:underline"
-              >
-                {translations[language].contactUs}
-              </button>
-            </nav>
+            <hr className="border-[#8C8C8C] border-0.5 mr-2" />
+            <p className="text-white py-3 text-center text-sm font-normal">
+              {translations[language].rightsReserved}
+            </p>
           </div>
-          <hr className="border-[#8C8C8C] border-0.5 mr-2" />
-          <p className="text-white py-3 text-center text-sm font-normal">
-            {translations[language].rightsReserved}
-          </p>
-        </div>
-      </footer>
+        </footer>
     </>
   );
 };
